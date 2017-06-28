@@ -114,7 +114,7 @@ contract PotOfGold {
         address winner1 = pot.players[(loserIndex + 1) % 3];
         address winner2 = pot.players[(loserIndex + 2) % 3];
 
-        uint winAmount = ((pot.buyIn * / 2) * 99) / 100;
+        uint winAmount = ((pot.buyIn / 2) * 99) / 100;
         uint returnAmount = pot.buyIn + winAmount;
 
         winner1.send(returnAmount);
