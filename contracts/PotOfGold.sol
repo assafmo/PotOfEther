@@ -48,7 +48,7 @@ contract PotOfGold {
 
         allPots.push(pot);
 
-        newPot(name, buyIn, msg.sender)
+        newPot(name, buyIn, msg.sender);
     }
 
     function joinPot(string name) {
@@ -107,6 +107,8 @@ contract PotOfGold {
         bytes32 potShaResult = sha3(msg.sender, blockHash);
         uint8 loserIndex = uint8(uint256(potShaResult) % 3);
 
+        pot.loser = pot.players[loserIndex];
+
         address winner1 = pot.players[(loserIndex + 1) % 3];
         address winner2 = pot.players[(loserIndex + 2) % 3];
 
@@ -116,6 +118,6 @@ contract PotOfGold {
         winner1.transfer(returnAmount);
         winner2.transfer(returnAmount);
 
-        event potClosed(name, pot.players[loserIndex]);
+        event potClosed(name, pot.loser);
     }
 }
