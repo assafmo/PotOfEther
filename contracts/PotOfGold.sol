@@ -1,4 +1,4 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.11;
 contract PotOfGold {
 
     struct Pot {
@@ -12,7 +12,7 @@ contract PotOfGold {
         address loser;
     }
     
-    address owner;
+    address public owner;
     
     Pot[] allPots;
     mapping(address => Pot[]) playerToPots;
@@ -23,12 +23,12 @@ contract PotOfGold {
     }
 
     function ownerWithdraw(){
-        if(msg.sender != owner) throw;
+        require(msg.sender == owner);
 
-        int toWithdraw = this.balance - 100 finney; // leave 0.1 ether for gas (?) 
-        if(toWithdraw < 0) throw;
+        int toWithdraw = int(this.balance - 100 finney); // leave 0.1 ether for gas (?) 
+        require(toWithdraw > 0);
 
-        owner.send(toWithdraw);
+        owner.transfer(uint(toWithdraw));
     }
 
     function getMyPots() constant returns (Pot[]){
@@ -44,9 +44,9 @@ contract PotOfGold {
     }
 
     function createPot(string name, uint buyIn) {
-        if(buyIn == 0) throw; // must bet something
-        if(bytes(name).length == 0) throw; // name mustn't be empty 
-        if(nameToPot[name].buyIn != 0) throw; // there's already a pot with this name 
+        require(buyIn > 0); // must bet something
+        require(bytes(name).length > 0); // name mustn't be empty 
+        require(nameToPot[name].buyIn == 0); // there isn't already a pot with this name 
 
         Pot pot = nameToPot[name];
         pot.name = name;
@@ -60,10 +60,10 @@ contract PotOfGold {
 
     function joinPot(string name) {
         Pot pot = nameToPot[name];
-        if(pot.buyIn == 0) throw; // no pot
-        if(pot.loser != 0) throw; // pot is over
-        if(pot.players.length == 3) throw; // pot is full but waiting for a loser
-        if(msg.value != pot.buyIn) throw; // must bet buyin amount
+        require(pot.buyIn > 0); // pot exists
+        require(pot.loser == 0); // pot isn't over
+        require(pot.players.length < 3); // pot isn't full
+        require(msg.value == pot.buyIn); // must bet buyIn amount
        
         pot.players.push(msg.sender);
         if(pot.players.length == 3){
@@ -88,21 +88,21 @@ contract PotOfGold {
        
         pot.players = newPlayers;
 
-        msg.sender.send((pot.buyIn * 99) / 100); // leaving fee 1%
+        msg.sender.transfer((pot.buyIn * 99) / 100); // leaving fee 1%
     }*/
 
     function solvePot(string name){
         Pot pot = nameToPot[name];
-        if(pot.loser != 0) throw; // pot is over
-        if(pot.players.length < 3) throw; // pot not full
-        if(block.number <= pot.lastPlayerBlockNumber) throw;
+        require(pot.loser == 0); // pot isn't over
+        require(pot.players.length == 3); // pot full
+        require(block.number > pot.lastPlayerBlockNumber);
         
         bytes32 blockHash = block.blockhash(pot.lastPlayerBlockNumber + 1);
         if(blockHash == 0) { // pot expired due to hash storage limits - players didn't solve pot
             pot.loser = msg.sender; // doesn't matter, everybody loses a fee
             
             for(uint i = 0; i < pot.players.length; i++){
-                pot.players[i].send((pot.buyIn * 99) / 100); // return money minus 1% fee
+                pot.players[i].transfer((pot.buyIn * 99) / 100); // return money minus 1% fee
             }
 
             return;
@@ -117,7 +117,7 @@ contract PotOfGold {
         uint winAmount = ((pot.buyIn / 2) * 99) / 100;
         uint returnAmount = pot.buyIn + winAmount;
 
-        winner1.send(returnAmount);
-        winner2.send(returnAmount);
+        winner1.transfer(returnAmount);
+        winner2.transfer(returnAmount);
     }
 }
