@@ -93,6 +93,7 @@ contract PotOfGold {
         
         bytes32 blockHash = block.blockhash(pot.lastPlayerBlockNumber + 1);
         if(blockHash == 0) { // pot expired due to hash storage limits - players didn't solve pot
+            require(pot.loser == 0); // need this?
             pot.loser = msg.sender; // doesn't matter, everybody loses a fee
             
             for(uint i = 0; i < pot.players.length; i++){
@@ -106,6 +107,7 @@ contract PotOfGold {
         bytes32 potShaResult = sha3(msg.sender, blockHash);
         uint8 loserIndex = uint8(uint256(potShaResult) % 3);
 
+        require(pot.loser == 0); // need this?
         pot.loser = pot.players[loserIndex];
 
         address winner1 = pot.players[(loserIndex + 1) % 3];
