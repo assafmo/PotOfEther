@@ -19,6 +19,7 @@ contract PotOfGold {
     
     event newPot(string name, uint buyIn, address creator);
     event potJoin(string name, address newPlayer);
+    event potFull(string name);
     event potExpired(string name);
     event potClosed(string name, address loser);
 
@@ -61,6 +62,7 @@ contract PotOfGold {
         pot.players.push(msg.sender);
         if(pot.players.length == 3){
             pot.lastPlayerBlockNumber = block.number;
+            potFull(name);
         }
 
         potJoin(name, msg.sender);
