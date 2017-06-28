@@ -51,19 +51,19 @@ contract PotOfGold {
 
     function joinPot(string name) payable {
         Pot pot = nameToPot[name];
-        require(pot.buyIn > 0); // pot exists
-        require(pot.loser == 0); // pot isn't over
-        require(pot.players.length < 3); // pot isn't full
-        require(msg.value == pot.buyIn); // must pay buyIn amount
-        require(pot.players[0] != msg.sender && pot.players[1] != msg.sender);
+        // require(pot.buyIn > 0); // pot exists
+        // require(pot.loser == 0); // pot isn't over
+        // require(pot.players.length < 3); // pot isn't full
+        // require(msg.value == pot.buyIn); // must pay buyIn amount
+        // require(pot.players[0] != msg.sender && pot.players[1] != msg.sender);
 
         pot.players.push(msg.sender);
+        potJoin(name, msg.sender);
+        
         if(pot.players.length == 3){
             pot.lastPlayerBlockNumber = block.number;
             potFull(name);
         }
-
-        potJoin(name, msg.sender);
     }
 
     function solvePot(string name){
