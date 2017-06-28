@@ -21,10 +21,16 @@ contract PotOfGold {
     event potFull(string name);
     event potExpired(string name);
     event potClosed(string name, address loser);
-    event playerWon(address player, uint amount); 
+    event playerWon(string name, address player, uint amount); 
 
     function PotOfGold() {
         owner = msg.sender;
+    }
+
+    function getTotal() constant returns (uint){
+        require(msg.sender == owner);
+
+        return this.balance;
     }
 
     function ownerWithdraw(){
@@ -100,10 +106,10 @@ contract PotOfGold {
         uint returnAmount = pot.buyIn + winAmount;
 
         winner1.transfer(returnAmount);
-        playerWon(winner1, winAmount);
+        playerWon(name, winner1, winAmount);
 
         winner2.transfer(returnAmount);
-        playerWon(winner2, winAmount);
+        playerWon(name, winner2, winAmount);
 
         potClosed(name, pot.loser);
     }
