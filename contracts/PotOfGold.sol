@@ -35,7 +35,7 @@ contract PotOfGold {
         owner.transfer(uint(toWithdraw));
     }
 
-    function createPot(string name, uint buyIn) payable {
+    function createPot(string name) payable {
         require(msg.value > 0); // must bet something
         require(bytes(name).length > 0); // name mustn't be empty 
         require(nameToPot[name].buyIn == 0); // there isn't already a pot with this name 
