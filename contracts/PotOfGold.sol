@@ -17,11 +17,12 @@ contract PotOfGold {
     Pot[] allPots;
     mapping(string => Pot) nameToPot;
     
-    event newPot(string name, uint buyIn, address creator);
+    event newPot(string name, uint buyIn, address creatorPlayer);
     event potJoin(string name, address newPlayer);
     event potFull(string name);
     event potExpired(string name);
     event potClosed(string name, address loser);
+    event playerWon(address player, uint amount); 
 
     function PotOfGold() {
         owner = msg.sender;
@@ -100,7 +101,10 @@ contract PotOfGold {
         uint returnAmount = pot.buyIn + winAmount;
 
         winner1.transfer(returnAmount);
+        playerWon(winner1, winAmount);
+
         winner2.transfer(returnAmount);
+        playerWon(winner2, winAmount);
 
         potClosed(name, pot.loser);
     }
