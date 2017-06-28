@@ -14,8 +14,8 @@ contract PotOfGold {
     
     address public owner;
     
-    Pot[] public allPots;
-    mapping(string => Pot) public nameToPot;
+    Pot[] allPots;
+    mapping(string => Pot) nameToPot;
     
     event newPot(string name, uint buyIn, address creator);
     event potJoin(string name, address newPlayer);
