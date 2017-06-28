@@ -118,6 +118,6 @@ contract PotOfGold {
         winner1.transfer(returnAmount);
         winner2.transfer(returnAmount);
 
-        event potClosed(name, pot.loser);
+        potClosed(name, pot.loser);
     }
 }
