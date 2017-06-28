@@ -15,9 +15,13 @@ contract PotOfGold {
     address public owner;
     
     Pot[] allPots;
-    mapping(address => Pot[]) playerToPots;
     mapping(string => Pot) nameToPot;
     
+    event newPot(string name, uint buyIn, address creator);
+    event potJoin(string name, address newPlayer);
+    event potExpired(string name);
+    event potClosed(string name, address loser);
+
     function PotOfGold() {
         owner = msg.sender;
     }
@@ -29,18 +33,6 @@ contract PotOfGold {
         require(toWithdraw > 0);
 
         owner.transfer(uint(toWithdraw));
-    }
-
-    function getMyPots() constant returns (Pot[]){
-        return playerToPots(msg.sender);
-    }
-
-    function getAllPots() constant returns (Pot[]){
-        return allPots;
-    }
-
-    function getPot(string name) constant returns (Pot){
-        return nameToPot[name];
     }
 
     function createPot(string name, uint buyIn) {
@@ -55,7 +47,8 @@ contract PotOfGold {
         pot.buyIn = buyIn;
 
         allPots.push(pot);
-        playerToPots[msg.sender].push(pot);
+
+        newPot(name, buyIn, msg.sender)
     }
 
     function joinPot(string name) {
@@ -69,6 +62,8 @@ contract PotOfGold {
         if(pot.players.length == 3){
            pot.lastPlayerBlockNumber = block.number;
         }
+
+        potJoin(name, msg.sender);
     }
 
     /*function leavePot(string name) {
@@ -105,6 +100,7 @@ contract PotOfGold {
                 pot.players[i].transfer((pot.buyIn * 99) / 100); // return money minus 1% fee
             }
 
+            potExpired(name);
             return;
         }
 
@@ -119,5 +115,7 @@ contract PotOfGold {
 
         winner1.transfer(returnAmount);
         winner2.transfer(returnAmount);
+
+        event potClosed(name, pot.players[loserIndex]);
     }
 }
