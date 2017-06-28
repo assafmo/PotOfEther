@@ -51,11 +51,13 @@ contract PotOfGold {
 
     function joinPot(string name) payable {
         Pot pot = nameToPot[name];
-        // require(pot.buyIn > 0); // pot exists
-        // require(pot.loser == 0); // pot isn't over
-        // require(pot.players.length < 3); // pot isn't full
-        // require(msg.value == pot.buyIn); // must pay buyIn amount
-        // require(pot.players[0] != msg.sender && pot.players[1] != msg.sender);
+        require(pot.buyIn > 0); // pot exists
+        require(pot.loser == 0); // pot isn't over
+        require(pot.players.length < 3); // pot isn't full
+        require(msg.value == pot.buyIn); // must pay buyIn amount
+        for(uint i = 0; i < pot.players.length; i++){
+            require(pot.players[i] != msg.sender); //must be new to this pot
+        }
 
         pot.players.push(msg.sender);
         potJoin(name, msg.sender);
@@ -70,7 +72,7 @@ contract PotOfGold {
         Pot pot = nameToPot[name];
         require(pot.loser == 0); // pot isn't over
         require(pot.players.length == 3); // pot full
-        require(block.number > pot.lastPlayerBlockNumber);
+        require(block.number > pot.lastPlayerBlockNumber + 1);
         
         bytes32 blockHash = block.blockhash(pot.lastPlayerBlockNumber + 1);
         if(blockHash == 0) { // pot expired due to hash storage limits - players didn't solve pot
