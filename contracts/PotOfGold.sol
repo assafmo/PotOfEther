@@ -56,34 +56,15 @@ contract PotOfGold {
         require(pot.loser == 0); // pot isn't over
         require(pot.players.length < 3); // pot isn't full
         require(msg.value == pot.buyIn); // must pay buyIn amount
-       
+        require(pot.players[0] != msg.sender && pot.players[1] != msg.sender);
+
         pot.players.push(msg.sender);
         if(pot.players.length == 3){
-           pot.lastPlayerBlockNumber = block.number;
+            pot.lastPlayerBlockNumber = block.number;
         }
 
         potJoin(name, msg.sender);
     }
-
-    /*function leavePot(string name) {
-        Pot pot = nameToPot[name];
-        if(pot.buyIn == 0) throw; // no pot
-        if(pot.loser != 0) throw; // pot is over
-        if(pot.players.length == 3) throw; // pot is full but waiting for a loser
-
-        if(pot.players[0] != msg.sender && pot.players[1] != msg.sender) throw; // no such player in pot
-        
-        address[] newPlayers;
-        for(uint i = 0; i < pot.players.length; i++){
-            if(pot.players[i] != msg.sender){
-                newPlayers.push(pot.players[i]);
-            }
-        }
-       
-        pot.players = newPlayers;
-
-        msg.sender.transfer((pot.buyIn * 99) / 100); // leaving fee 1%
-    }*/
 
     function solvePot(string name){
         Pot pot = nameToPot[name];
