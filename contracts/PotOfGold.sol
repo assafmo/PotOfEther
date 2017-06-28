@@ -35,28 +35,27 @@ contract PotOfGold {
         owner.transfer(uint(toWithdraw));
     }
 
-    function createPot(string name, uint buyIn) {
-        require(buyIn > 0); // must bet something
+    function createPot(string name, uint buyIn) payable {
+        require(msg.value > 0); // must bet something
         require(bytes(name).length > 0); // name mustn't be empty 
         require(nameToPot[name].buyIn == 0); // there isn't already a pot with this name 
 
         Pot pot = nameToPot[name];
         pot.name = name;
-        pot.buyIn = buyIn;
+        pot.buyIn = msg.value;
         pot.players.push(msg.sender);
-        pot.buyIn = buyIn;
 
         allPots.push(pot);
 
-        newPot(name, buyIn, msg.sender);
+        newPot(name, msg.value, msg.sender);
     }
 
-    function joinPot(string name) {
+    function joinPot(string name) payable {
         Pot pot = nameToPot[name];
         require(pot.buyIn > 0); // pot exists
         require(pot.loser == 0); // pot isn't over
         require(pot.players.length < 3); // pot isn't full
-        require(msg.value == pot.buyIn); // must bet buyIn amount
+        require(msg.value == pot.buyIn); // must pay buyIn amount
        
         pot.players.push(msg.sender);
         if(pot.players.length == 3){
