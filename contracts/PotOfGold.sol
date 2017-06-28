@@ -14,7 +14,6 @@ contract PotOfGold {
     
     address public owner;
     
-    Pot[] allPots;
     mapping(string => Pot) nameToPot;
     
     event newPot(string name, uint buyIn, address creatorPlayer);
@@ -46,8 +45,6 @@ contract PotOfGold {
         pot.name = name;
         pot.buyIn = msg.value;
         pot.players.push(msg.sender);
-
-        allPots.push(pot);
 
         newPot(name, msg.value, msg.sender);
     }
