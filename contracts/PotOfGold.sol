@@ -74,6 +74,14 @@ contract PotOfGold {
         }
     }
 
+    function canSolvePot(string name) constant returns (bool){
+        Pot pot = nameToPot[name];
+        require(pot.loser == 0); // pot isn't over
+        require(pot.players.length == 3); // pot full
+        require(block.number > pot.lastPlayerBlockNumber + 1);
+        return true;
+    }
+
     function solvePot(string name){
         Pot pot = nameToPot[name];
         require(pot.loser == 0); // pot isn't over
