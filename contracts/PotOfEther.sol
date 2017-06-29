@@ -19,11 +19,13 @@ contract PotOfEther {
     uint totalRefunds;
     
     
-    event newPot(string indexed name, uint buyIn, address indexed firstPlayer);
-    event potJoin(string indexed name, address indexed newPlayer);
-    event potFull(string indexed name);
-    event potExpired(string indexed name);
-    event potClosed(string indexed name, address indexed winner1, address indexed winner2, address indexed loser);
+    event LogPotCreated(string indexed name, uint buyIn, address indexed firstPlayer);
+    event LogPotJoin(string indexed name, address indexed newPlayer);
+    event LogPotFull(string indexed name);
+    event LogPotExpired(string indexed name);
+    event LogPotClosed(string indexed name);
+    event LogPotWinner(string indexed name, address indexed winner);
+    event LogPotLoser(string indexed name, address indexed loser);
 
     function PotOfGold() {
         owner = msg.sender;
@@ -55,8 +57,8 @@ contract PotOfEther {
         pot.players.push(msg.sender);
         pot.isOpen = true;
 
-        newPot(name, msg.value, msg.sender);
-        potJoin(name, msg.sender);
+        LogPotCreated(name, msg.value, msg.sender);
+        LogPotJoin(name, msg.sender);
     }
 
     function joinPot(string name) payable {
@@ -69,11 +71,11 @@ contract PotOfEther {
         }
 
         pot.players.push(msg.sender);
-        potJoin(name, msg.sender);
+        LogPotJoin(name, msg.sender);
         
         if(pot.players.length == 3){
             pot.lastPlayerBlockNumber = block.number;
-            potFull(name);
+            LogPotFull(name);
         }
     }
 
@@ -100,7 +102,7 @@ contract PotOfEther {
                 totalRefunds += ((pot.buyIn * 99) / 100); // return money minus 1% fee
             }
 
-            potExpired(name);
+            LogPotExpired(name);
             return;
         }
 
@@ -118,7 +120,10 @@ contract PotOfEther {
         refunds[winner2] += refundAmount;
         totalRefunds += refundAmount * 2;
 
-        potClosed(name, winner1, winner2, loser);
+        LogPotClosed(name);
+        LogPotWinner(name, winner1);
+        LogPotWinner(name, winner2);
+        LogPotLoser(name, loser);
     }
 
     function withdrawRefund() {
