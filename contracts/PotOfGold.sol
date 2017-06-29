@@ -7,21 +7,23 @@ contract PotOfGold {
 
         address[] players;
         
-        uint lastPlayerBlockNumber; // uint8(uint256(sha3(block.blockhash(lastPlayerBlockNumber+1)))) % 3 == loser index 
+        uint lastPlayerBlockNumber;
         
-        address loser;
+        bool isOpen;
     }
     
     address public owner;
     
     mapping(string => Pot) nameToPot;
+    mapping(address => uint) refunds;
+    uint totalRefunds;
+    
     
     event newPot(string name, uint buyIn, address creatorPlayer);
     event potJoin(string name, address newPlayer);
     event potFull(string name);
     event potExpired(string name);
-    event potClosed(string name, address loser);
-    event playerWon(string name, address player, uint amount); 
+    event potClosed(string name, address winner1, address winner2, address loser);
 
     function PotOfGold() {
         owner = msg.sender;
@@ -36,7 +38,7 @@ contract PotOfGold {
     function ownerWithdraw(){
         require(msg.sender == owner);
 
-        int toWithdraw = int(this.balance - 100 finney); // leave 0.1 ether for gas (?) 
+        int toWithdraw = int(this.balance) - int(100 finney) - int(totalRefunds); // leave 0.1 ether for gas (?) 
         require(toWithdraw > 0);
 
         owner.transfer(uint(toWithdraw));
@@ -51,6 +53,7 @@ contract PotOfGold {
         pot.name = name;
         pot.buyIn = msg.value;
         pot.players.push(msg.sender);
+        pot.isOpen = true;
 
         newPot(name, msg.value, msg.sender);
     }
@@ -58,7 +61,7 @@ contract PotOfGold {
     function joinPot(string name) payable {
         Pot pot = nameToPot[name];
         require(pot.buyIn > 0); // pot exists
-        require(pot.loser == 0); // pot isn't over
+        require(pot.isOpen); // pot isn't over
         require(pot.players.length < 3); // pot isn't full
         require(msg.value == pot.buyIn); // must pay buyIn amount
         for(uint i = 0; i < pot.players.length; i++){
@@ -74,51 +77,55 @@ contract PotOfGold {
         }
     }
 
-    function canSolvePot(string name) constant returns (bool){
+    function canClosePot(string name) constant returns (bool){
         Pot pot = nameToPot[name];
-        require(pot.loser == 0); // pot isn't over
-        require(pot.players.length == 3); // pot full
-        require(block.number > pot.lastPlayerBlockNumber + 1);
-        return true;
+        return  pot.isOpen &&
+                pot.players.length == 3 &&
+                block.number > pot.lastPlayerBlockNumber + 1;
     }
 
-    function solvePot(string name){
+    function closePot(string name){
         Pot pot = nameToPot[name];
-        require(pot.loser == 0); // pot isn't over
+        require(pot.isOpen); // pot isn't over
         require(pot.players.length == 3); // pot full
         require(block.number > pot.lastPlayerBlockNumber + 1);
         
+        pot.isOpen = false;
+        
         bytes32 blockHash = block.blockhash(pot.lastPlayerBlockNumber + 1);
         if(blockHash == 0) { // pot expired due to hash storage limits - players didn't solve pot
-            require(pot.loser == 0); // need this?
-            pot.loser = msg.sender; // doesn't matter, everybody loses a fee
             
             for(uint i = 0; i < pot.players.length; i++){
-                pot.players[i].transfer((pot.buyIn * 99) / 100); // return money minus 1% fee
+                refunds[pot.players[i]] += ((pot.buyIn * 99) / 100); // return money minus 1% fee
+                totalRefunds += ((pot.buyIn * 99) / 100); // return money minus 1% fee
             }
 
             potExpired(name);
             return;
         }
 
-        bytes32 potShaResult = sha3(now, blockHash);
+        bytes32 potShaResult = sha3(blockHash);
         uint8 loserIndex = uint8(uint256(potShaResult) % 3);
 
-        require(pot.loser == 0); // need this?
-        pot.loser = pot.players[loserIndex];
-
+        address loser = pot.players[loserIndex];
         address winner1 = pot.players[(loserIndex + 1) % 3];
         address winner2 = pot.players[(loserIndex + 2) % 3];
 
-        uint winAmount = ((pot.buyIn / 2) * 99) / 100;
-        uint returnAmount = pot.buyIn + winAmount;
+        uint winAmount = ((pot.buyIn / 2) * 99) / 100; // split the buy-in and take 1% fee
+        uint refundAmount = pot.buyIn + winAmount;
 
-        winner1.transfer(returnAmount);
-        playerWon(name, winner1, winAmount);
+        refunds[winner1] += refundAmount;
+        refunds[winner2] += refundAmount;
+        totalRefunds += refundAmount * 2;
 
-        winner2.transfer(returnAmount);
-        playerWon(name, winner2, winAmount);
+        potClosed(name, winner1, winner2, loser);
+    }
 
-        potClosed(name, pot.loser);
+    function withdrawRefund() {
+        uint refund = refunds[msg.sender];
+        refunds[msg.sender] = 0;
+        totalRefunds -= refund;
+
+        msg.sender.transfer(refund); // this'll throw and restore state on failure
     }
 }
