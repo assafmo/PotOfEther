@@ -19,13 +19,13 @@ contract PotOfEther {
     uint totalRefunds;
     
     
-    event LogPotCreated(string indexed name, uint buyIn, address indexed firstPlayer);
-    event LogPotJoin(string indexed name, address indexed newPlayer);
-    event LogPotFull(string indexed name);
-    event LogPotExpired(string indexed name);
-    event LogPotClosed(string indexed name);
-    event LogPotWinner(string indexed name, address indexed winner);
-    event LogPotLoser(string indexed name, address indexed loser);
+    event LogPotCreated(string name, uint buyIn, address indexed firstPlayer);
+    event LogPotJoin(string name, address indexed newPlayer);
+    event LogPotFull(string name);
+    event LogPotExpired(string name);
+    event LogPotClosed(string name);
+    event LogPotWinner(string name, address indexed winner);
+    event LogPotLoser(string name, address indexed loser);
 
     function PotOfGold() {
         owner = msg.sender;
