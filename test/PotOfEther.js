@@ -256,6 +256,19 @@ contract("PotOfEther", accounts => {
       }
       assert(false, "pot is already closed but another close didn't fail");
     });
+
+    it("fail when pot doesn't exists", async () => {
+      var instance = await PotOfEther.new();
+      const name = "banana";
+
+      try {
+        await instance.closePot(name);
+      } catch (err) {
+        assert(true);
+        return;
+      }
+      assert(false, "pot doesn't exists but close didn't fail");
+    });
   });
 });
 
