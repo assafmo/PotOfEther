@@ -6,7 +6,7 @@ contract('PotOfEther', accounts => {
       var instance = await PotOfEther.new();
 
       try {
-        await instance.createPot('pot1', {
+        await instance.createPot('banana', {
           from: accounts[0],
           value: 0
         });
@@ -32,6 +32,27 @@ contract('PotOfEther', accounts => {
       assert(false, "empty name but didn't fail");
     });
 
+    it('should fail when name already exists', async () => {
+      var instance = await PotOfEther.new();
+
+      await instance.createPot('banana', {
+        from: accounts[0],
+        value: 1000
+      });
+
+      try {
+        await instance.createPot('banana', {
+          from: accounts[0],
+          value: 1000
+        });
+      } catch (err) {
+        assert(true);
+        return;
+      }
+
+      assert(false, "two pots with same name but didn't fail");
+    });
+
     it('should emit LogPotCreated event', async () => {
       var instance = await PotOfEther.new();
 
@@ -49,13 +70,13 @@ contract('PotOfEther', accounts => {
     it('should emit LogPotJoin event', async () => {
       var instance = await PotOfEther.new();
 
-      var result = await instance.createPot('papaya', {
+      var result = await instance.createPot('banana', {
         from: accounts[0],
         value: 1000
       });
 
       assert.equal(result.logs.length, 2);
-      assert.equal(result.logs[1].args.name, 'papaya');
+      assert.equal(result.logs[1].args.name, 'banana');
       assert.equal(result.logs[1].args.newPlayer, accounts[0]);
     });
   })
