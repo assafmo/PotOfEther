@@ -81,7 +81,7 @@ contract PotOfEther {
 
     function canClosePot(string name) constant returns (bool){
         Pot pot = nameToPot[name];
-        return  pot.isOpen &&
+        return pot.isOpen &&
                 pot.players.length == 3 &&
                 block.number > pot.lastPlayerBlockNumber + 1;
     }
@@ -93,16 +93,16 @@ contract PotOfEther {
         require(block.number > pot.lastPlayerBlockNumber + 1);
         
         pot.isOpen = false;
+        LogPotClosed(name);
         
         bytes32 blockHash = block.blockhash(pot.lastPlayerBlockNumber + 1);
         if(blockHash == 0) { // pot expired due to hash storage limits - players didn't solve pot
+            LogPotExpired(name);
             
             for(uint i = 0; i < pot.players.length; i++){
                 refunds[pot.players[i]] += ((pot.buyIn * 99) / 100); // return money minus 1% fee
                 totalRefunds += ((pot.buyIn * 99) / 100); // return money minus 1% fee
             }
-
-            LogPotExpired(name);
             return;
         }
 
@@ -120,7 +120,6 @@ contract PotOfEther {
         refunds[winner2] += refundAmount;
         totalRefunds += refundAmount * 2;
 
-        LogPotClosed(name);
         LogPotWinner(name, winner1);
         LogPotWinner(name, winner2);
         LogPotLoser(name, loser);
