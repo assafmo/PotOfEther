@@ -6,10 +6,7 @@ contract("PotOfEther", accounts => {
       var instance = await PotOfEther.new();
 
       try {
-        await instance.createPot("banana", {
-          from: accounts[0],
-          value: 0
-        });
+        await instance.createPot("banana", { from: accounts[0], value: 0 });
       } catch (err) {
         assert(true);
         return;
@@ -21,10 +18,7 @@ contract("PotOfEther", accounts => {
       var instance = await PotOfEther.new();
 
       try {
-        await instance.createPot("", {
-          from: accounts[0],
-          value: 1000
-        });
+        await instance.createPot("", { from: accounts[0], value: 1000 });
       } catch (err) {
         assert(true);
         return;
@@ -35,16 +29,10 @@ contract("PotOfEther", accounts => {
     it("fail when name already exists", async () => {
       var instance = await PotOfEther.new();
 
-      await instance.createPot("banana", {
-        from: accounts[0],
-        value: 1000
-      });
+      await instance.createPot("banana", { from: accounts[0], value: 1000 });
 
       try {
-        await instance.createPot("banana", {
-          from: accounts[0],
-          value: 1000
-        });
+        await instance.createPot("banana", { from: accounts[0], value: 1000 });
       } catch (err) {
         assert(true);
         return;
@@ -56,10 +44,7 @@ contract("PotOfEther", accounts => {
     it("emit LogPotCreated event", async () => {
       var instance = await PotOfEther.new();
 
-      var result = await instance.createPot("banana", {
-        from: accounts[0],
-        value: 1000
-      });
+      var result = await instance.createPot("banana", { from: accounts[0], value: 1000 });
 
       assert.equal(result.logs.length, 2);
       assert.equal(result.logs[0].args.name, "banana");
@@ -70,10 +55,7 @@ contract("PotOfEther", accounts => {
     it("emit LogPotJoin event", async () => {
       var instance = await PotOfEther.new();
 
-      var result = await instance.createPot("banana", {
-        from: accounts[0],
-        value: 1000
-      });
+      var result = await instance.createPot("banana", { from: accounts[0], value: 1000 });
 
       assert.equal(result.logs.length, 2);
       assert.equal(result.logs[1].args.name, "banana");
@@ -107,7 +89,7 @@ contract("PotOfEther", accounts => {
       while (true) {
         // now we create dummy transactions,
         // closePot needs to wait 2 blocks after last player has joined 
-        await instance.createPot("dummy" + i, { from: accounts[0], value: 1000 });
+        await instance.createPot(`dummy-${i}`, { from: accounts[0], value: 1000 });
         i++;
 
         if (await instance.canClosePot.call(name) === true) {
@@ -144,6 +126,21 @@ contract("PotOfEther", accounts => {
         return;
       }
       assert(false, "pot is full but join didn't fail");
+    });
+
+    it("fail when wrong buyIn", async () => {
+      var instance = await PotOfEther.new();
+      const name = "banana";
+
+      await instance.createPot(name, { from: accounts[0], value: 1000 });
+
+      try {
+        await instance.joinPot(name, { from: accounts[1], value: 1001 });
+      } catch (err) {
+        assert(true);
+        return;
+      }
+      assert(false, "join with wrong buyIn didn't fail");
     });
   })
 });
