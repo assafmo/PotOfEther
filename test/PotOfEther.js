@@ -47,17 +47,19 @@ contract("PotOfEther", accounts => {
       var result = await instance.createPot("banana", { from: accounts[0], value: 1000 });
 
       assert.equal(result.logs.length, 2);
+      assert.equal(result.logs[0].event, "LogPotCreated");
       assert.equal(result.logs[0].args.name, "banana");
       assert.equal(result.logs[0].args.buyIn.valueOf(), 1000);
       assert.equal(result.logs[0].args.firstPlayer, accounts[0]);
     });
 
-    it("emit LogPotJoin event", async () => {
+    it("emit LogPotJoined event", async () => {
       var instance = await PotOfEther.new();
 
       var result = await instance.createPot("banana", { from: accounts[0], value: 1000 });
 
       assert.equal(result.logs.length, 2);
+      assert.equal(result.logs[1].event, "LogPotJoined");
       assert.equal(result.logs[1].args.name, "banana");
       assert.equal(result.logs[1].args.newPlayer, accounts[0]);
     });
@@ -188,6 +190,35 @@ contract("PotOfEther", accounts => {
         return;
       }
       assert(false, "same player joined twice but didn't fail");
+    });
+
+    it("emit LogPotJoined event", async () => {
+      var instance = await PotOfEther.new();
+      const name = "banana";
+
+      await instance.createPot(name, { from: accounts[0], value: 1000 });
+      var result = await instance.joinPot(name, { from: accounts[1], value: 1000 });
+
+      assert.equal(result.logs.length, 1);
+      assert.equal(result.logs[0].event, "LogPotJoined");
+      assert.equal(result.logs[0].args.name, name);
+      assert.equal(result.logs[0].args.newPlayer, accounts[1]);
+    });
+
+    it("emit LogPotJoined & LogPotFull events", async () => {
+      var instance = await PotOfEther.new();
+      const name = "banana";
+
+      await instance.createPot(name, { from: accounts[0], value: 1000 });
+      await instance.joinPot(name, { from: accounts[1], value: 1000 });
+      var result = await instance.joinPot(name, { from: accounts[2], value: 1000 });
+
+      assert.equal(result.logs.length, 2);
+      assert.equal(result.logs[0].event, "LogPotJoined");
+      assert.equal(result.logs[0].args.name, name);
+      assert.equal(result.logs[0].args.newPlayer, accounts[2]);
+      assert.equal(result.logs[1].event, "LogPotFull");
+      assert.equal(result.logs[1].args.name, name);
     });
   })
 });
