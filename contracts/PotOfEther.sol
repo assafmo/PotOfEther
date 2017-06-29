@@ -88,7 +88,7 @@ contract PotOfEther {
 
     function closePot(string name){
         Pot pot = nameToPot[name];
-        require(pot.isOpen); // pot isn't over
+        require(pot.isOpen); // pot isn't closed
         require(pot.players.length == 3); // pot full
         require(block.number > pot.lastPlayerBlockNumber + 1);
         
