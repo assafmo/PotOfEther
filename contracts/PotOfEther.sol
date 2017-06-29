@@ -44,7 +44,7 @@ contract PotOfEther {
         owner.transfer(uint(toWithdraw));
     }
 
-    function createPot(string indexed name) payable {
+    function createPot(string name) payable {
         require(msg.value > 0); // must bet something
         require(bytes(name).length > 0); // name mustn't be empty 
         require(nameToPot[name].buyIn == 0); // there isn't already a pot with this name 
@@ -59,7 +59,7 @@ contract PotOfEther {
         potJoin(name, msg.sender);
     }
 
-    function joinPot(string indexed name) payable {
+    function joinPot(string name) payable {
         Pot pot = nameToPot[name];
         require(pot.isOpen); // pot exists and isn't over
         require(pot.players.length < 3); // pot isn't full
@@ -77,14 +77,14 @@ contract PotOfEther {
         }
     }
 
-    function canClosePot(string indexed name) constant returns (bool){
+    function canClosePot(string name) constant returns (bool){
         Pot pot = nameToPot[name];
         return  pot.isOpen &&
                 pot.players.length == 3 &&
                 block.number > pot.lastPlayerBlockNumber + 1;
     }
 
-    function closePot(string indexed name){
+    function closePot(string name){
         Pot pot = nameToPot[name];
         require(pot.isOpen); // pot isn't over
         require(pot.players.length == 3); // pot full
