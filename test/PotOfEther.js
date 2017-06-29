@@ -66,7 +66,7 @@ contract("PotOfEther", accounts => {
       assert.equal(result.logs[1].args.name, name);
       assert.equal(result.logs[1].args.newPlayer, accounts[0]);
     });
-  })
+  });
 
   describe("joinPot", () => {
     it("fail when pot doesn't exists", async () => {
@@ -223,7 +223,40 @@ contract("PotOfEther", accounts => {
       assert.equal(result.logs[1].event, "LogPotFull");
       assert.equal(result.logs[1].args.name, name);
     });
-  })
+  });
+
+  describe("closePot", () => {
+    it("fail when pot already closed", async () => {
+      var instance = await PotOfEther.new();
+      const name = "banana";
+
+      await instance.createPot(name, { from: accounts[0], value: 1000 });
+      await instance.joinPot(name, { from: accounts[1], value: 1000 });
+      await instance.joinPot(name, { from: accounts[2], value: 1000 });
+
+      var i = 1;
+      while (true) {
+        // now we create dummy transactions,
+        // closePot needs to wait 2 blocks after last player has joined 
+        await instance.createPot(`dummy-${i}`, { from: accounts[0], value: 1000 });
+        i++;
+
+        if (await instance.canClosePot.call(name) === true) {
+          break;
+        }
+      }
+
+      await instance.closePot(name);
+
+      try {
+        await instance.closePot(name);
+      } catch (err) {
+        assert(true);
+        return;
+      }
+      assert(false, "pot is already closed but another close didn't fail");
+    });
+  });
 });
 
 
