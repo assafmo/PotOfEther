@@ -93,7 +93,7 @@ contract PotOfGold {
             return;
         }
 
-        bytes32 potShaResult = sha3(msg.sender, blockHash);
+        bytes32 potShaResult = sha3(now, blockHash);
         uint8 loserIndex = uint8(uint256(potShaResult) % 3);
 
         require(pot.loser == 0); // need this?
