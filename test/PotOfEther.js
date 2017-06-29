@@ -142,6 +142,53 @@ contract("PotOfEther", accounts => {
       }
       assert(false, "join with wrong buyIn didn't fail");
     });
+
+    it("fail when creator entering twice", async () => {
+      var instance = await PotOfEther.new();
+      const name = "banana";
+
+      await instance.createPot(name, { from: accounts[0], value: 1000 });
+
+      try {
+        await instance.joinPot(name, { from: accounts[0], value: 1000 });
+      } catch (err) {
+        assert(true);
+        return;
+      }
+      assert(false, "creator joined twice but didn't fail");
+    });
+
+    it("fail when creator entering twice (2)", async () => {
+      var instance = await PotOfEther.new();
+      const name = "banana";
+
+      await instance.createPot(name, { from: accounts[0], value: 1000 });
+      await instance.joinPot(name, { from: accounts[1], value: 1000 });
+
+      try {
+        await instance.joinPot(name, { from: accounts[0], value: 1000 });
+      } catch (err) {
+        assert(true);
+        return;
+      }
+      assert(false, "creator joined twice but didn't fail");
+    });
+
+    it("fail when player entering twice", async () => {
+      var instance = await PotOfEther.new();
+      const name = "banana";
+
+      await instance.createPot(name, { from: accounts[0], value: 1000 });
+      await instance.joinPot(name, { from: accounts[1], value: 1000 });
+
+      try {
+        await instance.joinPot(name, { from: accounts[1], value: 1000 });
+      } catch (err) {
+        assert(true);
+        return;
+      }
+      assert(false, "same player joined twice but didn't fail");
+    });
   })
 });
 
