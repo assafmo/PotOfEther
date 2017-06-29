@@ -1,5 +1,5 @@
 pragma solidity ^0.4.11;
-contract PotOfGold {
+contract PotOfEther {
 
     struct Pot {
         string name;
