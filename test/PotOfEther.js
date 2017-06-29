@@ -129,6 +129,22 @@ contract("PotOfEther", accounts => {
       assert(false, "pot is closed but join didn't fail");
     });
 
+    it("fail when pot is full", async () => {
+      var instance = await PotOfEther.new();
+      const name = "banana";
+
+      await instance.createPot(name, { from: accounts[0], value: 1000 });
+      await instance.joinPot(name, { from: accounts[1], value: 1000 });
+      await instance.joinPot(name, { from: accounts[2], value: 1000 });
+
+      try {
+        await instance.joinPot(name, { from: accounts[3], value: 1000 });
+      } catch (err) {
+        assert(true);
+        return;
+      }
+      assert(false, "pot is full but join didn't fail");
+    });
   })
 });
 
