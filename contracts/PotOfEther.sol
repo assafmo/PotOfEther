@@ -19,11 +19,11 @@ contract PotOfEther {
     uint totalRefunds;
     
     
-    event newPot(string name, uint buyIn, address creatorPlayer);
-    event potJoin(string name, address newPlayer);
-    event potFull(string name);
-    event potExpired(string name);
-    event potClosed(string name, address winner1, address winner2, address loser);
+    event newPot(string indexed name, uint buyIn, address indexed firstPlayer);
+    event potJoin(string indexed name, address indexed newPlayer);
+    event potFull(string indexed name);
+    event potExpired(string indexed name);
+    event potClosed(string indexed name, address indexed winner1, address indexed winner2, address indexed loser);
 
     function PotOfGold() {
         owner = msg.sender;
@@ -44,7 +44,7 @@ contract PotOfEther {
         owner.transfer(uint(toWithdraw));
     }
 
-    function createPot(string name) payable {
+    function createPot(string indexed name) payable {
         require(msg.value > 0); // must bet something
         require(bytes(name).length > 0); // name mustn't be empty 
         require(nameToPot[name].buyIn == 0); // there isn't already a pot with this name 
@@ -56,9 +56,10 @@ contract PotOfEther {
         pot.isOpen = true;
 
         newPot(name, msg.value, msg.sender);
+        potJoin(name, msg.sender);
     }
 
-    function joinPot(string name) payable {
+    function joinPot(string indexed name) payable {
         Pot pot = nameToPot[name];
         require(pot.isOpen); // pot exists and isn't over
         require(pot.players.length < 3); // pot isn't full
@@ -76,14 +77,14 @@ contract PotOfEther {
         }
     }
 
-    function canClosePot(string name) constant returns (bool){
+    function canClosePot(string indexed name) constant returns (bool){
         Pot pot = nameToPot[name];
         return  pot.isOpen &&
                 pot.players.length == 3 &&
                 block.number > pot.lastPlayerBlockNumber + 1;
     }
 
-    function closePot(string name){
+    function closePot(string indexed name){
         Pot pot = nameToPot[name];
         require(pot.isOpen); // pot isn't over
         require(pot.players.length == 3); // pot full
