@@ -20,7 +20,7 @@ contract PotOfEther {
     
     
     event LogPotCreated(string name, uint buyIn, address indexed firstPlayer);
-    event LogPotJoin(string name, address indexed newPlayer);
+    event LogPotJoined(string name, address indexed newPlayer);
     event LogPotFull(string name);
     event LogPotExpired(string name);
     event LogPotClosed(string name);
@@ -58,7 +58,7 @@ contract PotOfEther {
         pot.isOpen = true;
 
         LogPotCreated(name, msg.value, msg.sender);
-        LogPotJoin(name, msg.sender);
+        LogPotJoined(name, msg.sender);
     }
 
     function joinPot(string name) payable {
@@ -71,7 +71,7 @@ contract PotOfEther {
         }
 
         pot.players.push(msg.sender);
-        LogPotJoin(name, msg.sender);
+        LogPotJoined(name, msg.sender);
         
         if(pot.players.length == 3){
             pot.lastPlayerBlockNumber = block.number;
