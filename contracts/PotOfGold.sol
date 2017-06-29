@@ -60,8 +60,7 @@ contract PotOfGold {
 
     function joinPot(string name) payable {
         Pot pot = nameToPot[name];
-        require(pot.buyIn > 0); // pot exists
-        require(pot.isOpen); // pot isn't over
+        require(pot.isOpen); // pot exists and isn't over
         require(pot.players.length < 3); // pot isn't full
         require(msg.value == pot.buyIn); // must pay buyIn amount
         for(uint i = 0; i < pot.players.length; i++){
