@@ -2,36 +2,38 @@ var PotOfEther = artifacts.require('./PotOfEther.sol');
 
 contract('PotOfEther', accounts => {
   describe('createPot', () => {
-    it('should pay buy in > 0', async () => {
-      var instance = await PotOfEther.deployed();
+    it('should fail when buyIn == 0', async () => {
+      var instance = await PotOfEther.new();
 
       try {
         await instance.createPot('pot1', {
           from: accounts[0],
           value: 0
         });
-        assert.equal(true, false);
       } catch (err) {
-        assert.equal(true, true);
+        assert(true);
+        return;
       }
+      assert(false, "empty buyIn but didn't fail");
     });
 
-    it('should pass a name with name.length > 0', async () => {
-      var instance = await PotOfEther.deployed();
+    it('should fail when name.length == 0', async () => {
+      var instance = await PotOfEther.new();
 
       try {
-        await instance.createPot('pot1', {
+        await instance.createPot('', {
           from: accounts[0],
           value: 1000
         });
-        assert.equal(true, false);
       } catch (err) {
-        assert.equal(true, true);
+        assert(true);
+        return;
       }
+      assert(false, "empty name but didn't fail");
     });
 
     it('should emit LogPotCreated event', async () => {
-      var instance = await PotOfEther.deployed();
+      var instance = await PotOfEther.new();
 
       var result = await instance.createPot('banana', {
         from: accounts[0],
@@ -45,7 +47,7 @@ contract('PotOfEther', accounts => {
     });
 
     it('should emit LogPotJoin event', async () => {
-      var instance = await PotOfEther.deployed();
+      var instance = await PotOfEther.new();
 
       var result = await instance.createPot('papaya', {
         from: accounts[0],
