@@ -32,7 +32,7 @@ contract PotOfGold {
     function getTotal() constant returns (uint){
         require(msg.sender == owner);
 
-        return this.balance;
+        return this.balance - totalRefunds;
     }
 
     function ownerWithdraw(){
