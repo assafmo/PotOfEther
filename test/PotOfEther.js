@@ -1,5 +1,4 @@
 const PotOfEther = artifacts.require("./PotOfEther.sol");
-let accountIndex = 10;
 
 contract("PotOfEther", accounts => {
   describe("createPot", () => {
@@ -41,19 +40,6 @@ contract("PotOfEther", accounts => {
       }
 
       assert(false, "two pots with same name but didn't fail");
-    });
-
-    it("reduce creator balance by buyIn", async () => {
-      const instance = await PotOfEther.new();
-      const potName = "banana";
-      const buyIn = 1000;
-      const freshAccount = accounts[accountIndex++];
-
-      const balanceBeforeCreate = web3.eth.getBalance(freshAccount).toNumber();
-      const txResult = await instance.createPot(potName, { from: freshAccount, value: buyIn, gasPrice: 1 });
-
-      const balanceAfterCreateShouldBe = balanceBeforeCreate - txResult.receipt.gasUsed - buyIn;
-      assert.equal(balanceAfterCreateShouldBe, web3.eth.getBalance(freshAccount).toNumber(), txResult);
     });
 
     it("emit LogPotCreated event", async () => {
@@ -367,18 +353,16 @@ contract("PotOfEther", accounts => {
       const instance = await PotOfEther.new();
       const potName = "banana";
 
-      const freshAccounts = [accounts[accountIndex++], accounts[accountIndex++], accounts[accountIndex++]]
-
       const accountToIndex = {};
-      accountToIndex[freshAccounts[0]] = 0;
-      accountToIndex[freshAccounts[1]] = 1;
-      accountToIndex[freshAccounts[2]] = 2;
+      accountToIndex[accounts[0]] = 0;
+      accountToIndex[accounts[1]] = 1;
+      accountToIndex[accounts[2]] = 2;
 
       const buyIn = 1000;
 
-      await instance.createPot(potName, { from: freshAccounts[0], value: buyIn, gasPrice: 1 });
-      await instance.joinPot(potName, { from: freshAccounts[1], value: buyIn, gasPrice: 1 });
-      await instance.joinPot(potName, { from: freshAccounts[2], value: buyIn, gasPrice: 1 });
+      await instance.createPot(potName, { from: accounts[0], value: buyIn });
+      await instance.joinPot(potName, { from: accounts[1], value: buyIn });
+      await instance.joinPot(potName, { from: accounts[2], value: buyIn });
 
       await untilCanClosePot(instance, potName, accounts[9]);
 
@@ -388,16 +372,56 @@ contract("PotOfEther", accounts => {
       const winner2Index = accountToIndex[txResult.logs[2].args.winner];
 
       for (let i of [winner1Index, winner2Index]) {
-        const beforeRefund = web3.eth.getBalance(freshAccounts[i]).toNumber();
-        const txResult = await instance.withdrawRefund({ from: freshAccounts[i], gasPrice: 1 });
+        const txResult = await instance.withdrawRefund({ from: accounts[i] });
 
-        const afterRefundShoudBe = beforeRefund -
-          txResult.receipt.gasUsed +
-          buyIn +
-          Math.floor(Math.floor(Math.floor(buyIn / 2) * 99) / 100); //0.5 buyIn - 1% fee (no floats in solidity)
+        //0.5*buyIn - 1% fee (no floats in solidity)
+        const refundShoudBe = buyIn + Math.floor(Math.floor(Math.floor(buyIn / 2) * 99) / 100);
 
-        assert.equal(afterRefundShoudBe, web3.eth.getBalance(freshAccounts[i]).toNumber(), txResult);
+        const refundEvent = txResult.logs[0];
+
+        assert.equal(refundEvent.event, "LogAccountRefund");
+        assert.equal(refundEvent.args.account, accounts[i]);
+        assert.equal(refundEvent.args.refundAmount, refundShoudBe);
       }
+    });
+
+    it("zero refund for account with zero refund", async () => {
+      const instance = await PotOfEther.new();
+
+      const txResult = await instance.withdrawRefund({ from: accounts[0] });
+      const refundEvent = txResult.logs[0];
+
+      assert.equal(refundEvent.event, "LogAccountRefund");
+      assert.equal(refundEvent.args.account, accounts[0]);
+      assert.equal(refundEvent.args.refundAmount, 0);
+    });
+
+    it("zero refund for loser", async () => {
+      const instance = await PotOfEther.new();
+      const potName = "banana";
+
+      const accountToIndex = {};
+      accountToIndex[accounts[0]] = 0;
+      accountToIndex[accounts[1]] = 1;
+      accountToIndex[accounts[2]] = 2;
+
+      const buyIn = 1000;
+
+      await instance.createPot(potName, { from: accounts[0], value: buyIn });
+      await instance.joinPot(potName, { from: accounts[1], value: buyIn });
+      await instance.joinPot(potName, { from: accounts[2], value: buyIn });
+
+      await untilCanClosePot(instance, potName, accounts[9]);
+
+      const closeTxResult = await instance.closePot(potName, { from: accounts[9] });
+      const loserIndex = accountToIndex[closeTxResult.logs[3].args.loser];
+
+      const withdrawTxResult = await instance.withdrawRefund({ from: accounts[loserIndex] });
+      const refundEvent = withdrawTxResult.logs[0];
+
+      assert.equal(refundEvent.event, "LogAccountRefund");
+      assert.equal(refundEvent.args.account, accounts[loserIndex]);
+      assert.equal(refundEvent.args.refundAmount, 0);
     });
   });
 });
