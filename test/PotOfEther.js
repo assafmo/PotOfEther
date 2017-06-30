@@ -269,6 +269,23 @@ contract("PotOfEther", accounts => {
       }
       assert(false, "pot doesn't exists but close didn't fail");
     });
+
+    it("fail when close is too early", async () => {
+      var instance = await PotOfEther.new();
+      const name = "banana";
+
+      await instance.createPot(name, { from: accounts[0], value: 1000 });
+      await instance.joinPot(name, { from: accounts[1], value: 1000 });
+      await instance.joinPot(name, { from: accounts[2], value: 1000 });
+
+      try {
+        await instance.closePot(name);
+      } catch (err) {
+        assert(true);
+        return;
+      }
+      assert(false, "pot is too early to close but close didn't fail");
+    });
   });
 });
 
