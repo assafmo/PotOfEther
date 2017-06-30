@@ -99,10 +99,12 @@ contract PotOfEther {
         if(blockHash == 0) { // pot expired due to hash storage limits - players didn't solve pot
             LogPotExpired(name);
             
+            // return money minus 1% fee
             for(uint i = 0; i < pot.players.length; i++){
-                refunds[pot.players[i]] += ((pot.buyIn * 99) / 100); // return money minus 1% fee
-                totalRefunds += ((pot.buyIn * 99) / 100); // return money minus 1% fee
+                refunds[pot.players[i]] += ((pot.buyIn * 99) / 100);
+                totalRefunds += ((pot.buyIn * 99) / 100);
             }
+            
             return;
         }
 
