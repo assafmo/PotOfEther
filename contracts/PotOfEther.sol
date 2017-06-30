@@ -26,6 +26,7 @@ contract PotOfEther {
     event LogPotClosed(string name);
     event LogPotWinner(string name, address indexed winner);
     event LogPotLoser(string name, address indexed loser);
+    event LogAccountRefund(address indexed account, uint refundAmount);
 
     function PotOfGold() {
         owner = msg.sender;
@@ -127,11 +128,12 @@ contract PotOfEther {
         LogPotLoser(name, loser);
     }
 
-    function withdrawRefund() {
+    function withdrawRefund(){
         uint refund = refunds[msg.sender];
         refunds[msg.sender] = 0;
         totalRefunds -= refund;
 
-        msg.sender.transfer(refund); // this'll throw and restore state on failure
+        msg.sender.transfer(refund);
+        LogAccountRefund(msg.sender, refund);
     }
 }
