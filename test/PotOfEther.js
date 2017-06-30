@@ -95,10 +95,7 @@ contract("PotOfEther", accounts => {
       await instance.closePot(name);
 
       try {
-        await instance.joinPot(name, {
-          from: accounts[3],
-          value: 1000
-        });
+        await instance.joinPot(name, { from: accounts[3], value: 1000 });
       } catch (err) {
         assert(true);
         return;
@@ -349,10 +346,47 @@ contract("PotOfEther", accounts => {
       assert.equal(expiresEvent.args.name, name);
     });
   });
+
+  describe("withdrawRefund", () => {
+    it("refund winners, deduce fee", async () => {
+      var instance = await PotOfEther.new();
+      const name = "banana";
+
+      const accountToIndex = {};
+      accountToIndex[accounts[0]] = 0;
+      accountToIndex[accounts[1]] = 1;
+      accountToIndex[accounts[2]] = 2;
+
+      const buyIn = 1000;
+
+      await instance.createPot(name, { from: accounts[0], value: buyIn, gasPrice: 1 });
+      await instance.joinPot(name, { from: accounts[1], value: buyIn, gasPrice: 1 });
+      await instance.joinPot(name, { from: accounts[2], value: buyIn, gasPrice: 1 });
+
+      await untilCanClosePot(instance, name, accounts[9]);
+
+      const txResult = await instance.closePot(name, { from: accounts[9] });
+
+      const winner1Index = accountToIndex[txResult.logs[1].args.winner];
+      const winner2Index = accountToIndex[txResult.logs[2].args.winner];
+
+      for (let i of [winner1Index, winner2Index]) {
+        const beforeRefund = web3.eth.getBalance(accounts[i]).toNumber();
+        const txResult = await instance.withdrawRefund({ from: accounts[i], gasPrice: 1 });
+
+        const afterRefundShoudBe = beforeRefund -
+          txResult.receipt.gasUsed +
+          buyIn +
+          Math.floor(Math.floor(Math.floor(buyIn / 2) * 99) / 100); //0.5 buyIn - 1% fee (no floats in solidity)
+
+        assert.equal(afterRefundShoudBe, web3.eth.getBalance(accounts[i]).toNumber());
+      }
+    });
+  });
 });
 
 async function untilCanClosePot(instance, potName, account) {
-  var i = 1;
+  let i = 1;
   while (true) {
     // now we create dummy transactions,
     // closePot needs to wait 2 blocks after last player has joined 
@@ -366,8 +400,7 @@ async function untilCanClosePot(instance, potName, account) {
 }
 
 async function untilPotExpires(instance, potName, account) {
-  var potWasOpen = false;
-  for (var i = 0; i < 257; i++) {
+  for (let i = 0; i < 257; i++) {
     // now we create dummy transactions,
     // we need to wait 257 blocks after last player has joined
     // this is due to hash storage limits
