@@ -330,6 +330,24 @@ contract("PotOfEther", accounts => {
       assert(loserEvent.args.loser != result.logs[1].args.winner);
       assert(loserEvent.args.loser != result.logs[2].args.winner);
     });
+
+    it("emit LogPotExpired when close is expired", async () => {
+      var instance = await PotOfEther.new();
+      const name = "banana";
+
+      await instance.createPot(name, { from: accounts[0], value: 1000 });
+      await instance.joinPot(name, { from: accounts[1], value: 1000 });
+      await instance.joinPot(name, { from: accounts[2], value: 1000 });
+
+      await untilPotExpires(instance, name, accounts[9]);
+
+      var result = await instance.closePot(name);
+
+      var expiresEvent = result.logs[1];
+
+      assert.equal(expiresEvent.event, "LogPotExpired");
+      assert.equal(expiresEvent.args.name, name);
+    });
   });
 });
 
@@ -338,11 +356,22 @@ async function untilCanClosePot(instance, potName, account) {
   while (true) {
     // now we create dummy transactions,
     // closePot needs to wait 2 blocks after last player has joined 
-    await instance.createPot(`dummy-${i}`, { from: account, value: 1000 });
+    await instance.createPot(`dummy-${i}`, { from: account, value: 1 });
     i++;
 
     if (await instance.canClosePot.call(potName) === true) {
       break;
     }
+  }
+}
+
+async function untilPotExpires(instance, potName, account) {
+  var potWasOpen = false;
+  for (var i = 0; i < 257; i++) {
+    // now we create dummy transactions,
+    // we need to wait 257 blocks after last player has joined
+    // this is due to hash storage limits
+    // solidity can get hash of only last 256 blocks (not including the current one)
+    await instance.createPot(`dummy-${i}`, { from: account, value: 1 });
   }
 }
