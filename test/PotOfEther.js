@@ -433,7 +433,40 @@ contract("PotOfEther", accounts => {
       assert.equal((await instance.availableOwnerWithdraw.call()).toNumber(), 0);
     });
 
-    it("1% of winnins after pot", async () => {
+    it("zero after pot creation", async () => {
+      const instance = await PotOfEther.new();
+      const potName = "banana";
+      const buyIn = 1000;
+
+      await instance.createPot(potName, { from: accounts[0], value: buyIn });
+
+      assert.equal((await instance.availableOwnerWithdraw.call()).toNumber(), 0);
+    });
+
+    it("zero after pot join", async () => {
+      const instance = await PotOfEther.new();
+      const potName = "banana";
+      const buyIn = 1000;
+
+      await instance.createPot(potName, { from: accounts[0], value: buyIn });
+      await instance.joinPot(potName, { from: accounts[1], value: buyIn });
+
+      assert.equal((await instance.availableOwnerWithdraw.call()).toNumber(), 0);
+    });
+
+    it("zero while pot is open", async () => {
+      const instance = await PotOfEther.new();
+      const potName = "banana";
+      const buyIn = 1000;
+
+      await instance.createPot(potName, { from: accounts[0], value: buyIn });
+      await instance.joinPot(potName, { from: accounts[1], value: buyIn });
+      await instance.joinPot(potName, { from: accounts[2], value: buyIn });
+
+      assert.equal((await instance.availableOwnerWithdraw.call()).toNumber(), 0);
+    });
+
+    it("1% of winnins after pot close", async () => {
       const instance = await PotOfEther.new();
       const before = (await instance.availableOwnerWithdraw.call()).toNumber();
 
@@ -455,20 +488,20 @@ contract("PotOfEther", accounts => {
   });
 });
 
+//1% fee (no floats in solidity)
 function buyInToFee(buyIn) {
-  //1% fee (no floats in solidity)
   return buyIn - Math.floor(Math.floor(buyIn * 99) / 100);
 }
 
+//buyIn + 0.5*buyIn - 1% fee (no floats in solidity)
 function buyInToRefund(buyIn) {
-  //buyIn + 0.5*buyIn - 1% fee (no floats in solidity)
   return buyIn + Math.floor(Math.floor(Math.floor(buyIn / 2) * 99) / 100);
 }
 
+// closePot needs to wait 2 blocks after last player has joined 
+// so we'll create dummy transactions,
 async function untilCanClosePot(instance, potName, account) {
   while (true) {
-    // now we create dummy transactions,
-    // closePot needs to wait 2 blocks after last player has joined 
     await instance.ownerWithdraw();
 
     if (await instance.canClosePot.call(potName) === true) {
@@ -477,12 +510,12 @@ async function untilCanClosePot(instance, potName, account) {
   }
 }
 
+// we need to wait 257 blocks after last player has joined
+// this is due to hash storage limits
+// solidity can get hash of only last 256 blocks (not including the current one)
+// so we'll create dummy transactions
 async function untilPotExpires(instance, potName, account) {
   for (let i = 0; i < 257; i++) {
-    // now we create dummy transactions,
-    // we need to wait 257 blocks after last player has joined
-    // this is due to hash storage limits
-    // solidity can get hash of only last 256 blocks (not including the current one)
     await instance.ownerWithdraw();
   }
 }
