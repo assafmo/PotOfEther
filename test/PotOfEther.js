@@ -426,7 +426,39 @@ contract("PotOfEther", accounts => {
       assert.equal(refundEvent.args.refundAmount, 0);
     });
   });
+
+  describe("availableOwnerWithdraw", () => {
+    it("zero on init", async () => {
+      const instance = await PotOfEther.new();
+      assert.equal((await instance.availableOwnerWithdraw.call()).toNumber(), 0);
+    });
+
+    it("1% of winnins after pot", async () => {
+      const instance = await PotOfEther.new();
+      const before = (await instance.availableOwnerWithdraw.call()).toNumber();
+
+      const potName = "banana";
+      const buyIn = 1000;
+
+      await instance.createPot(potName, { from: accounts[0], value: buyIn });
+      await instance.joinPot(potName, { from: accounts[1], value: buyIn });
+      await instance.joinPot(potName, { from: accounts[2], value: buyIn });
+
+      await untilCanClosePot(instance, potName, accounts[9]);
+
+      await instance.closePot(potName, { from: accounts[9] });
+
+      const after = (await instance.availableOwnerWithdraw.call()).toNumber();
+
+      assert.equal(after - before, buyInToFee(buyIn));
+    });
+  });
 });
+
+function buyInToFee(buyIn) {
+  //1% fee (no floats in solidity)
+  return buyIn - Math.floor(Math.floor(buyIn * 99) / 100);
+}
 
 function buyInToRefund(buyIn) {
   //buyIn + 0.5*buyIn - 1% fee (no floats in solidity)
@@ -434,12 +466,10 @@ function buyInToRefund(buyIn) {
 }
 
 async function untilCanClosePot(instance, potName, account) {
-  let i = 1;
   while (true) {
     // now we create dummy transactions,
     // closePot needs to wait 2 blocks after last player has joined 
-    await instance.createPot(`dummy-${i}`, { from: account, value: 1 });
-    i++;
+    await instance.ownerWithdraw();
 
     if (await instance.canClosePot.call(potName) === true) {
       break;
@@ -453,6 +483,6 @@ async function untilPotExpires(instance, potName, account) {
     // we need to wait 257 blocks after last player has joined
     // this is due to hash storage limits
     // solidity can get hash of only last 256 blocks (not including the current one)
-    await instance.createPot(`dummy-${i}`, { from: account, value: 1 });
+    await instance.ownerWithdraw();
   }
 }
