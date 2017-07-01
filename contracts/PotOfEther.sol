@@ -18,8 +18,8 @@ contract PotOfEther {
     mapping(address => uint) public refunds;
     uint public totalPendingRefunds;
     
-    event LogPotCreated(string name, uint buyIn, address indexed firstPlayer);
-    event LogPotJoined(string name, address indexed newPlayer);
+    event LogPotCreated(string name, uint buyIn);
+    event LogPotJoined(string name, address indexed newPlayer, uint buyIn);
     event LogPotFull(string name);
     event LogPotExpired(string name);
     event LogPotClosed(string name);
@@ -52,8 +52,8 @@ contract PotOfEther {
 
         totalPendingRefunds += pot.buyIn; // owner can't withdraw this funds while pot is open
 
-        LogPotCreated(name, msg.value, msg.sender);
-        LogPotJoined(name, msg.sender);
+        LogPotCreated(name, msg.value);
+        LogPotJoined(name, msg.sender, msg.value);
     }
 
     function joinPot(string name) payable {
@@ -66,7 +66,7 @@ contract PotOfEther {
         }
 
         pot.players.push(msg.sender);
-        LogPotJoined(name, msg.sender);
+        LogPotJoined(name, msg.sender, msg.value);
         
         totalPendingRefunds += pot.buyIn; // owner can't withdraw this funds while pot is open
 
