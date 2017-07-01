@@ -37,13 +37,12 @@ contract PotOfEther {
     }
 
     function ownerWithdraw(){
-        int toWithdraw = int(this.balance) - int(totalPendingRefunds); // maybe leave some ether for gas? 
-        owner.transfer(uint(toWithdraw));
+        owner.transfer(availableOwnerWithdraw());
     }
 
     function createPot(string name) payable {
         require(msg.value > 0); // must bet something
-        require(bytes(name).length > 0); // name mustn't be empty 
+        require(bytes(name).length > 0); // name can't be empty 
         require(nameToPot[name].buyIn == 0); // there isn't already a pot with this name 
 
         Pot pot = nameToPot[name];
@@ -52,7 +51,7 @@ contract PotOfEther {
         pot.players.push(msg.sender);
         pot.isOpen = true;
 
-        totalPendingRefunds += pot.buyIn;
+        totalPendingRefunds += pot.buyIn; // owner can't withdraw this funds while pot is open
 
         LogPotCreated(name, msg.value, msg.sender);
         LogPotJoined(name, msg.sender);
@@ -70,7 +69,7 @@ contract PotOfEther {
         pot.players.push(msg.sender);
         LogPotJoined(name, msg.sender);
         
-        totalPendingRefunds += pot.buyIn;
+        totalPendingRefunds += pot.buyIn; // owner can't withdraw this funds while pot is open
 
         if(pot.players.length == 3){
             pot.lastPlayerBlockNumber = block.number;
