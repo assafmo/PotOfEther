@@ -12,7 +12,7 @@ contract PotOfEther {
         bool isOpen;
     }
     
-    address public owner;
+    address owner;
     
     mapping(string => Pot) nameToPot;
     mapping(address => uint) refunds;
@@ -32,7 +32,7 @@ contract PotOfEther {
         owner = msg.sender;
     }
 
-    function getAvailableOwnerWithdraw() constant returns (uint){
+    function availableOwnerWithdraw() constant returns (uint){
         return this.balance - totalRefunds;
     }
 
