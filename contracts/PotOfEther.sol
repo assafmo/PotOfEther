@@ -16,7 +16,7 @@ contract PotOfEther {
     
     mapping(string => Pot) nameToPot;
     mapping(address => uint) refunds;
-    uint totalRefunds;
+    uint totalPendingRefunds;
     
     
     event LogPotCreated(string name, uint buyIn, address indexed firstPlayer);
@@ -33,13 +33,11 @@ contract PotOfEther {
     }
 
     function availableOwnerWithdraw() constant returns (uint){
-        return this.balance - totalRefunds;
+        return this.balance - totalPendingRefunds;
     }
 
     function ownerWithdraw(){
-        int toWithdraw = int(this.balance) - int(100 finney) - int(totalRefunds); // leave 0.1 ether for gas (?) 
-        require(toWithdraw > 0);
-
+        int toWithdraw = int(this.balance) - int(totalPendingRefunds); // maybe leave some ether for gas? 
         owner.transfer(uint(toWithdraw));
     }
 
@@ -53,6 +51,8 @@ contract PotOfEther {
         pot.buyIn = msg.value;
         pot.players.push(msg.sender);
         pot.isOpen = true;
+
+        totalPendingRefunds += pot.buyIn;
 
         LogPotCreated(name, msg.value, msg.sender);
         LogPotJoined(name, msg.sender);
@@ -70,6 +70,8 @@ contract PotOfEther {
         pot.players.push(msg.sender);
         LogPotJoined(name, msg.sender);
         
+        totalPendingRefunds += pot.buyIn;
+
         if(pot.players.length == 3){
             pot.lastPlayerBlockNumber = block.number;
             LogPotFull(name);
@@ -91,15 +93,16 @@ contract PotOfEther {
         
         pot.isOpen = false;
         LogPotClosed(name);
+        totalPendingRefunds -= (pot.buyIn * 3);
         
         bytes32 blockHash = block.blockhash(pot.lastPlayerBlockNumber + 1);
-        if(blockHash == 0) { // pot expired due to hash storage limits - players didn't solve pot
+        if(blockHash == 0) { // pot expired due to hash storage limits - players didn't close pot
             LogPotExpired(name);
             
             // return money minus 1% fee
             for(uint i = 0; i < pot.players.length; i++){
                 refunds[pot.players[i]] += ((pot.buyIn * 99) / 100);
-                totalRefunds += ((pot.buyIn * 99) / 100);
+                totalPendingRefunds += ((pot.buyIn * 99) / 100);
             }
             
             return;
@@ -112,22 +115,28 @@ contract PotOfEther {
         address winner1 = pot.players[(loserIndex + 1) % 3];
         address winner2 = pot.players[(loserIndex + 2) % 3];
 
-        uint winAmount = ((pot.buyIn / 2) * 99) / 100; // split the buy-in and take 1% fee
-        uint refundAmount = pot.buyIn + winAmount;
+        uint fee = pot.buyIn / 100;
+        uint playerWinAmount = (pot.buyIn - fee) / 2; // take 1% fee and split winnins
+        uint winnerRefundAmount = pot.buyIn + playerWinAmount;
 
-        refunds[winner1] += refundAmount;
-        refunds[winner2] += refundAmount;
-        totalRefunds += refundAmount * 2;
+        refunds[winner1] += winnerRefundAmount;
+        totalPendingRefunds += winnerRefundAmount;
+        
+        refunds[winner2] += winnerRefundAmount;
+        totalPendingRefunds += winnerRefundAmount;
 
-        LogPotWinner(name, winner1, refundAmount);
-        LogPotWinner(name, winner2, refundAmount);
+        LogPotWinner(name, winner1, winnerRefundAmount);
+        LogPotWinner(name, winner2, winnerRefundAmount);
         LogPotLoser(name, loser);
+        log(this.balance, totalPendingRefunds);
     }
+
+    event log(uint balance, uint totalPendingRefunds);
 
     function withdrawRefund(){
         uint refund = refunds[msg.sender];
         refunds[msg.sender] = 0;
-        totalRefunds -= refund;
+        totalPendingRefunds -= refund;
 
         msg.sender.transfer(refund);
         LogAccountRefund(msg.sender, refund);
