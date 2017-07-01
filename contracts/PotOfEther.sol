@@ -12,12 +12,11 @@ contract PotOfEther {
         bool isOpen;
     }
     
-    address owner;
+    address public owner;
     
     mapping(string => Pot) nameToPot;
-    mapping(address => uint) refunds;
-    uint totalPendingRefunds;
-    
+    mapping(address => uint) public refunds;
+    uint public totalPendingRefunds;
     
     event LogPotCreated(string name, uint buyIn, address indexed firstPlayer);
     event LogPotJoined(string name, address indexed newPlayer);
