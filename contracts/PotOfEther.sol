@@ -24,7 +24,7 @@ contract PotOfEther {
     event LogPotFull(string name);
     event LogPotExpired(string name);
     event LogPotClosed(string name);
-    event LogPotWinner(string name, address indexed winner);
+    event LogPotWinner(string name, address indexed winner, uint refundAmount);
     event LogPotLoser(string name, address indexed loser);
     event LogAccountRefund(address indexed account, uint refundAmount);
 
@@ -32,15 +32,11 @@ contract PotOfEther {
         owner = msg.sender;
     }
 
-    function getTotal() constant returns (uint){
-        require(msg.sender == owner);
-
+    function getAvailableOwnerWithdraw() constant returns (uint){
         return this.balance - totalRefunds;
     }
 
     function ownerWithdraw(){
-        require(msg.sender == owner);
-
         int toWithdraw = int(this.balance) - int(100 finney) - int(totalRefunds); // leave 0.1 ether for gas (?) 
         require(toWithdraw > 0);
 
@@ -123,8 +119,8 @@ contract PotOfEther {
         refunds[winner2] += refundAmount;
         totalRefunds += refundAmount * 2;
 
-        LogPotWinner(name, winner1);
-        LogPotWinner(name, winner2);
+        LogPotWinner(name, winner1, refundAmount);
+        LogPotWinner(name, winner2, refundAmount);
         LogPotLoser(name, loser);
     }
 

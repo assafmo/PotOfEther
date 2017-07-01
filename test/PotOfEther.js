@@ -284,10 +284,11 @@ contract("PotOfEther", accounts => {
     it("emit LogPotWinner twice when close is ok", async () => {
       const instance = await PotOfEther.new();
       const potName = "banana";
+      const buyIn = 1000;
 
-      await instance.createPot(potName, { from: accounts[0], value: 1000 });
-      await instance.joinPot(potName, { from: accounts[1], value: 1000 });
-      await instance.joinPot(potName, { from: accounts[2], value: 1000 });
+      await instance.createPot(potName, { from: accounts[0], value: buyIn });
+      await instance.joinPot(potName, { from: accounts[1], value: buyIn });
+      await instance.joinPot(potName, { from: accounts[2], value: buyIn });
 
       await untilCanClosePot(instance, potName, accounts[9]);
 
@@ -298,10 +299,12 @@ contract("PotOfEther", accounts => {
 
       assert.equal(winner1Event.event, "LogPotWinner");
       assert.equal(winner1Event.args.name, potName);
+      assert.equal(winner1Event.args.refundAmount, buyInToRefund(buyIn));
       assert(new Set(accounts.slice(0, 3)).has(winner1Event.args.winner));
 
       assert.equal(winner2Event.event, "LogPotWinner");
       assert.equal(winner2Event.args.name, potName);
+      assert.equal(winner2Event.args.refundAmount, buyInToRefund(buyIn));
       assert(new Set(accounts.slice(0, 3)).has(winner2Event.args.winner));
 
       assert(winner1Event.args.winner != winner2Event.args.winner);
@@ -374,8 +377,7 @@ contract("PotOfEther", accounts => {
       for (let i of [winner1Index, winner2Index]) {
         const txResult = await instance.withdrawRefund({ from: accounts[i] });
 
-        //0.5*buyIn - 1% fee (no floats in solidity)
-        const refundShoudBe = buyIn + Math.floor(Math.floor(Math.floor(buyIn / 2) * 99) / 100);
+        const refundShoudBe = buyInToRefund(buyIn);
 
         const refundEvent = txResult.logs[0];
 
@@ -425,6 +427,11 @@ contract("PotOfEther", accounts => {
     });
   });
 });
+
+function buyInToRefund(buyIn) {
+  //buyIn + 0.5*buyIn - 1% fee (no floats in solidity)
+  return buyIn + Math.floor(Math.floor(Math.floor(buyIn / 2) * 99) / 100);
+}
 
 async function untilCanClosePot(instance, potName, account) {
   let i = 1;
