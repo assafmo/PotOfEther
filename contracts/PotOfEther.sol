@@ -126,10 +126,7 @@ contract PotOfEther {
         LogPotWinner(name, winner1, winnerRefundAmount);
         LogPotWinner(name, winner2, winnerRefundAmount);
         LogPotLoser(name, loser);
-        log(this.balance, totalPendingRefunds);
     }
-
-    event log(uint balance, uint totalPendingRefunds);
 
     function withdrawRefund(){
         uint refund = refunds[msg.sender];
