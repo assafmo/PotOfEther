@@ -1,4 +1,5 @@
 const PotOfEther = artifacts.require("./PotOfEther.sol");
+PotOfEther.deployed().then(x => console.log(x.address));
 
 contract("PotOfEther", accounts => {
   describe("createPot", () => {
