@@ -101,7 +101,18 @@ class MainBody extends React.Component {
                 <About />
             </Tab>
             <Tab eventKey={5} title="Terms of service">
-                ToS
+                <div style={{ padding: 10, fontSize: 'large' }}>
+                    <center>
+                        <h2>DISCLAIMER</h2>
+                        <p>Pot of Ether is an alph software on the experimental Ethereum blockchain and peer-to-peer network. By accessing the PotOfEther.com site you are agreeing to the following terms and any other terms or conditions that may be imposed from time to time.</p>
+                        <p>Pot of Ether accepts no responsibility or liability for any losses which may be incurred by any person or persons using the whole or part of the contents of the information, systems, plans, methods, and games contained herein and shown on this site. Use the information provided on the PotOfEther.com site at your own risk.</p>
+                        <p>Although Pot of Ether may show an address for decentralised application, we accept no responsibility for anything which may or may not occur through any dealings you have through interaction with that decentralised application on the blockchain.</p>
+                        <p>It is your responsibility to satisfy yourself that all decentralised applications that you deal with have a good code-base and will function correctly and as verified.</p>
+                        <p>No gambling occurs on the PotOfEther.com Website. Pot of Ether is not a casino. Only addresses for decentralised gambling games stored as decentralised ethereum applications are provided on the website for convenience.</p>
+                        <p>Pot of Ether does not promote or encourage illegal or underage gambling, or gambling to persons who reside in jurisdictions where gambling is considered unlawful. In those instances, this site is presented for informational and entertainment purposes only.</p>
+                        <p>By entering PotOfEther.com and using the Pot of Ether service you agree that you are aware of the terms outlined herein.</p>
+                    </center>
+                </div>
             </Tab>
         </Tabs>
     }
