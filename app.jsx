@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { Tabs, Tab, Table, Button } from 'react-bootstrap';
+import { Tabs, Tab, Table, Button, Panel } from 'react-bootstrap';
 
 // const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545 "));
 // web3.eth.defaultAccount = web3.eth.accounts[0];
@@ -14,11 +14,13 @@ import { Tabs, Tab, Table, Button } from 'react-bootstrap';
 
 class App extends React.Component {
     render() {
-        return <div style={{ padding: 10 }}>
+        return <Panel style={{ padding: 10 }} footer={<center>
+            <div style={{ verticalAlign: 'middle' }}>banana</div>
+        </center>}>
             <Header />
             <AccountGamesInfo />
             <MainBody />
-        </div>
+        </Panel>
     }
 }
 
