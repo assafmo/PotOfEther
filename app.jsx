@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { Tabs, Tab, Table } from 'react-bootstrap';
+import { Tabs, Tab, Table, Button } from 'react-bootstrap';
 
 // const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545 "));
 // web3.eth.defaultAccount = web3.eth.accounts[0];
@@ -48,22 +48,27 @@ class About extends React.Component {
 class PlayTab extends React.Component {
     render() {
         return <div style={{ padding: 10 }}>
-            <Table striped bordered condensed hover style={{ margin: "auto" }}>
+            <Table striped bordered condensed hover>
                 <thead>
                     <tr>
                         <th>Pot name</th>
                         <th>Players</th>
-                        <th>Buy in (Ether)</th>
-                        <th>Potential profit</th>
+                        <th>Buy in (ETH)</th>
+                        <th>Potential profit (ETH)</th>
+                        <th>Join pot</th>
                     </tr>
                 </thead>
                 <tbody>
                     {[
-                        [1, '1 out of 3', 1.123, 4],
-                        [5, '2 out of 3', 11.23, 8],
-                        [9, '1 out of 3', , 3.123, 12]
+                        ['banana', '1 out of 3', 1.123, 4, null],
+                        ['papaya', '2 out of 3', 11.23, 8, null],
+                        ['/dev/null', '1 out of 3', , 3.123, 12, null]
                     ]
-                        .map((row, i) => <tr key={i}>{row.map(col => <td key={col}>{col}</td>)}</tr>)}
+                        .map((row, i) => <tr key={i}>
+                            {row.map(col => <td key={col}>
+                                {col ? col : <Button bsStyle="success">Join</Button>}
+                            </td>)}
+                        </tr>)}
                 </tbody>
             </Table>
         </div>
@@ -76,7 +81,7 @@ class MainBody extends React.Component {
                 <PlayTab />
             </Tab>
             <Tab eventKey={2} title="Your games">
-                Tab 1 content
+                Tab 2 content
             </Tab>
             <Tab eventKey={3} title="Games History">
                 Tab 2 content
