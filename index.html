@@ -4,20 +4,46 @@
     <title>Pot of Ether</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-</head>
 
-<body style="background-color: #efefef;">
-    <div id="app"></div>
     <style>
         html {
             /*save space for scrollbar*/
             overflow-y: scroll;
         }
+
+        footer {
+            background-color: #efefef;
+            width: 100%;
+            bottom: 0;
+            position: fixed;
+            vertical-align: middle;
+            text-align: center;
+            padding: 5;
+        }
+
+        .center {
+            vertical-align: middle;
+            text-align: center;
+        }
     </style>
+</head>
+
+<header class="center">
+    <img src="./pot.png" />
+</header>
+
+<body style="background-color: white;">
+    <div id="app"></div>
     <link rel="stylesheet" href="./bootstrap.min.css">
 
     <script src="./web3.min.js" type="text/javascript"></script>
     <script src="./app.js " type="text/javascript "></script>
 </body>
+<footer>
+    <div style="font-size: smaller">
+        Non-Commercial Ethereum Proof of Concept Game. Play Responsibly and use the testnet versions preferably. Do not play if you
+        are under 18. Do not play if the game is not allowed in your jurisdiction.
+    </div>
+</footer>
 
 </html>

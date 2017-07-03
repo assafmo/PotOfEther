@@ -14,34 +14,33 @@ import { Tabs, Tab, Table, Button, Panel } from 'react-bootstrap';
 
 class App extends React.Component {
     render() {
-        return <Panel style={{ padding: 10 }} footer={<center>
-            <div style={{ verticalAlign: 'middle' }}>banana</div>
-        </center>}>
-            <Header />
-            <AccountGamesInfo />
-            <MainBody />
-        </Panel>
-    }
-}
-
-class Header extends React.Component {
-    render() {
-        return <div>Pot of Ether</div>;
+        return <div >
+            <About />
+            <div style={{ padding: 10 }}>
+                <AccountGamesInfo />
+                <MainBody />
+            </div>
+        </div>
     }
 }
 
 class AccountGamesInfo extends React.Component {
     render() {
-        return <center>
-            Games played, Ether wagered, Ether won, Ether pending...
-        </center>
+        return <div className="center">
+            Games played, Wagered, Profit, Pending...
+        </div>
     }
 }
 
 class About extends React.Component {
     render() {
-        return <div>
-            Three players fill a pot with Ether, one of them will leave empty handed.
+        return <div className="center" style={{ fontSize: "x-large" }}>
+            <div>
+                Three players fill a pot with Ether. One of them will leave empty handed.
+            </div>
+            <div>
+                Provably Fair, No accounts, No deposits.
+            </div>
         </div>
 
     }
@@ -58,12 +57,12 @@ class PlayTab extends React.Component {
                         {['Pot name',
                             'Buy in (ETH)',
                             'Potential profit (ETH)',
-                            'Players (Joined)',
+                            'Players (Date joined)',
                             'Join pot']
                             .map((header, idx) => <th key={idx} style={{ verticalAlign: 'middle' }}>
-                                <center>
+                                <div className="center">
                                     {header}
-                                </center>
+                                </div>
                             </th>)}
                     </tr>
                 </thead>
@@ -75,11 +74,11 @@ class PlayTab extends React.Component {
                     ]
                         .map((row, i) => <tr key={i}>
                             {row.map(col => <td key={col} style={{ verticalAlign: 'middle' }}>
-                                <center>
+                                <div className="center">
                                     {col ? (Array.isArray(col) ?
                                         col.map(x => <div>{x.account} ({x.date.toJSON()})</div>)
                                         : col) : <Button bsStyle="success">Join</Button>}
-                                </center>
+                                </div>
                             </td>)}
                         </tr>)}
                 </tbody>
@@ -99,12 +98,9 @@ class MainBody extends React.Component {
             <Tab eventKey={3} title="Games History">
                 Tab 2 content
             </Tab>
-            <Tab eventKey={4} title="About">
-                <About />
-            </Tab>
-            <Tab eventKey={5} title="Terms of service">
+            <Tab eventKey={4} title="Terms of service">
                 <div style={{ padding: 10, fontSize: 'large' }}>
-                    <center>
+                    <div className="center">
                         <h2>DISCLAIMER</h2>
                         <p>Pot of Ether is an alph software on the experimental Ethereum blockchain and peer-to-peer network. By accessing the PotOfEther.com site you are agreeing to the following terms and any other terms or conditions that may be imposed from time to time.</p>
                         <p>Pot of Ether accepts no responsibility or liability for any losses which may be incurred by any person or persons using the whole or part of the contents of the information, systems, plans, methods, and games contained herein and shown on this site. Use the information provided on the PotOfEther.com site at your own risk.</p>
@@ -113,7 +109,7 @@ class MainBody extends React.Component {
                         <p>No gambling occurs on the PotOfEther.com Website. Pot of Ether is not a casino. Only addresses for decentralised gambling games stored as decentralised ethereum applications are provided on the website for convenience.</p>
                         <p>Pot of Ether does not promote or encourage illegal or underage gambling, or gambling to persons who reside in jurisdictions where gambling is considered unlawful. In those instances, this site is presented for informational and entertainment purposes only.</p>
                         <p>By entering PotOfEther.com and using the Pot of Ether service you agree that you are aware of the terms outlined herein.</p>
-                    </center>
+                    </div>
                 </div>
             </Tab>
         </Tabs>
