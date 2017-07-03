@@ -27,7 +27,7 @@ contract PotOfEther {
     event LogPotLoser(string name, address indexed loser);
     event LogAccountRefund(address indexed account, uint refundAmount);
 
-    function PotOfGold() {
+    function PotOfEther() {
         owner = msg.sender;
     }
 
