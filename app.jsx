@@ -52,13 +52,17 @@ class PlayTab extends React.Component {
                 <thead>
                     <tr>
                         <th>Pot name</th>
-                        <th>Ether buy in</th>
                         <th>Players</th>
-                        <th>Username</th>
+                        <th>Buy in (Ether)</th>
+                        <th>Potential profit</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]
+                    {[
+                        [1, '1 out of 3', 1.123, 4],
+                        [5, '2 out of 3', 11.23, 8],
+                        [9, '1 out of 3', , 3.123, 12]
+                    ]
                         .map((row, i) => <tr key={i}>{row.map(col => <td key={col}>{col}</td>)}</tr>)}
                 </tbody>
             </Table>
@@ -80,7 +84,7 @@ class MainBody extends React.Component {
             <Tab eventKey={4} title="About">
                 <About />
             </Tab>
-            <Tab eventKey={4} title="Terms of service">
+            <Tab eventKey={5} title="Terms of service">
                 ToS
             </Tab>
         </Tabs>
