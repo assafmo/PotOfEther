@@ -47,26 +47,37 @@ class About extends React.Component {
 
 class PlayTab extends React.Component {
     render() {
+        const mockBuyIn = 1.215646;
+        const mockProfit = mockBuyIn * 0.5 - mockBuyIn * 0.01;
         return <div style={{ padding: 10 }}>
             <Table striped bordered condensed hover>
                 <thead>
                     <tr>
-                        <th>Pot name</th>
-                        <th>Players</th>
-                        <th>Buy in (ETH)</th>
-                        <th>Potential profit (ETH)</th>
-                        <th>Join pot</th>
+                        {['Pot name',
+                            'Buy in (ETH)',
+                            'Potential profit (ETH)',
+                            'Players (Joined)',
+                            'Join pot']
+                            .map((header, idx) => <th key={idx} style={{ verticalAlign: 'middle' }}>
+                                <center>
+                                    {header}
+                                </center>
+                            </th>)}
                     </tr>
                 </thead>
                 <tbody>
                     {[
-                        ['banana', '1 out of 3', 1.123, 4, null],
-                        ['papaya', '2 out of 3', 11.23, 8, null],
-                        ['/dev/null', '1 out of 3', , 3.123, 12, null]
+                        ['banana', mockBuyIn, mockProfit, [{ account: '0xe04969173ccbbd8ab40c33b0d3868d9e6131cfa3', date: new Date() }], null],
+                        ['papaya', mockBuyIn, mockProfit, [{ account: '0xe04969173ccbbd8ab40c33b0d3868d9e6131cfa3', date: new Date() }, { account: '0xe04969173ccbbd8ab40c33b0d3868d9e6131cfa3', date: new Date() }], null],
+                        ['/dev/null', mockBuyIn, mockProfit, [{ account: '0xe04969173ccbbd8ab40c33b0d3868d9e6131cfa3', date: new Date() }], null]
                     ]
                         .map((row, i) => <tr key={i}>
-                            {row.map(col => <td key={col}>
-                                {col ? col : <Button bsStyle="success">Join</Button>}
+                            {row.map(col => <td key={col} style={{ verticalAlign: 'middle' }}>
+                                <center>
+                                    {col ? (Array.isArray(col) ?
+                                        col.map(x => <div>{x.account} ({x.date.toJSON()})</div>)
+                                        : col) : <Button bsStyle="success">Join</Button>}
+                                </center>
                             </td>)}
                         </tr>)}
                 </tbody>
