@@ -76,7 +76,7 @@ class PlayTab extends React.Component {
                             {row.map(col => <td key={col} style={{ verticalAlign: 'middle' }}>
                                 <div className="center">
                                     {col ? (Array.isArray(col) ?
-                                        col.map(x => <div>{x.account} ({x.date.toJSON()})</div>)
+                                        col.map((x, idx) => <div key={idx}>{x.account} ({x.date.toJSON()})</div>)
                                         : col) : <Button bsStyle="success">Join</Button>}
                                 </div>
                             </td>)}
@@ -86,6 +86,59 @@ class PlayTab extends React.Component {
         </div>
     }
 }
+
+class TermsOfService extends React.Component {
+    render() {
+        return <div style={{ padding: 10, fontSize: 'large' }}>
+            <div className="center">
+                <h2>DISCLAIMER</h2>
+                <p>PotOfEther is an alph software on the experimental Ethereum blockchain and peer-to-peer network. By accessing the PotOfEther.com site you are agreeing to the following terms and any other terms or conditions that may be imposed from time to time.</p>
+                <p>PotOfEther accepts no responsibility or liability for any losses which may be incurred by any person or persons using the whole or part of the contents of the information, systems, plans, methods, and games contained herein and shown on this site. Use the information provided on the PotOfEther.com site at your own risk.</p>
+                <p>Although PotOfEther may show an address for decentralised application, we accept no responsibility for anything which may or may not occur through any dealings you have through interaction with that decentralised application on the blockchain.</p>
+                <p>It is your responsibility to satisfy yourself that all decentralised applications that you deal with have a good code-base and will function correctly and as verified.</p>
+                <p>No gambling occurs on the PotOfEther.com Website. PotOfEther is not a casino. Only addresses for decentralised gambling games stored as decentralised Ethereum applications are provided on the website for convenience.</p>
+                <p>PotOfEther does not promote or encourage illegal or underage gambling, or gambling to persons who reside in jurisdictions where gambling is considered unlawful. In those instances, this site is presented for informational and entertainment purposes only.</p>
+                <p>By entering PotOfEther.com and using the PotOfEther service you agree that you are aware of the terms outlined herein.</p>
+            </div>
+        </div>
+    }
+}
+
+class FAQ extends React.Component {
+    render() {
+        return <div style={{ padding: 10 }}>
+            <h4><b>What is this?</b></h4>
+            PotOfEther is a distributed application written as a smart contract and powered by the Ethereum blockchain.
+            <h4><b>What is a pot?</b></h4>
+            A pot is a game between 3 players. It is created with a buy-in amount, and each player must pay the buy-in in order to participate. After the third player has joined the game, two winner are chosen at random and they split the loser's buy-in between them. <b>Therefore, in each game each player has 66.67% chance of winnig 50% of the buy-in.</b>
+            <h4><b>Do I need an account?</b></h4>
+            No. Your sending address is your account. You can track all your results under "Your games" section.
+            <h4><b>How much does it cost to play?</b></h4>
+            PotOfEther takes 1% fee from your winnigs. For example, if you win a pot with a buy-in of 1 ETH, you profit 0.495 ETH and PotOfEther gets 0.005 ETH.
+            <h4><b>When can a pot be closed?</b></h4>
+            A pot can be closed two blocks after the last player has joined the game, which is roughly 1-2 minutes. Also a block must be closed less then 256 blocks after the last player has joined. This is due to Ethereum blockhash storage limits. If a pot is closed later then 256 blocks (roughly 2 hours) after the last player had joined the game, PotOfEther refunds each player the buy-in minus 1% fee.
+            <h4><b>Who can close a pot?</b></h4>
+            Anyone. PotOfEther is a distributed application powered by the Ethereum blockchain, therefore is has no servers and cannot know when to close a pot. One of the players has to close the pot manually.
+            <h4><b>How winners are decided?</b></h4>
+            PotOfEther uses the blockhash of the block following the last player's entrance to the game in order to determine the winners.
+            <h4><b>What about miners cheating?</b></h4>
+            Well, it is not worth to cheat as a miner when a pot's profit is less then 4.375 ETH. <b>Therefore it is not advisable to join a pot with buy-in lager than 8.75 ETH.</b>
+            <h4><b>What is the contact's address?</b></h4>
+            <ul>
+                <li>MainNet - XXXXXXXXXXXX</li>
+                <li>TestNet - XXXXXXXXXXXX</li>
+                <li>MainNet - XXXXXXXXXXXX</li>
+                <li>MainNet - XXXXXXXXXXXX</li>
+                <li>MainNet - XXXXXXXXXXXX</li>
+            </ul>
+            <h4><b>Who owns PotOfEther?</b></h4>
+            PotOfEther lives in the Ethereum blockchain and has no owners.
+            <h4><b>How can I contact the site's manager?</b></h4>
+            <a href="mailto:potofether@gmail.com" target="_blank">potofether@gmail.com</a>
+        </div>
+    }
+}
+
 class MainBody extends React.Component {
     render() {
         return <Tabs defaultActiveKey={1} id="main-tabs">
@@ -98,19 +151,11 @@ class MainBody extends React.Component {
             <Tab eventKey={3} title="Games History">
                 Tab 2 content
             </Tab>
-            <Tab eventKey={4} title="Terms of service">
-                <div style={{ padding: 10, fontSize: 'large' }}>
-                    <div className="center">
-                        <h2>DISCLAIMER</h2>
-                        <p>Pot of Ether is an alph software on the experimental Ethereum blockchain and peer-to-peer network. By accessing the PotOfEther.com site you are agreeing to the following terms and any other terms or conditions that may be imposed from time to time.</p>
-                        <p>Pot of Ether accepts no responsibility or liability for any losses which may be incurred by any person or persons using the whole or part of the contents of the information, systems, plans, methods, and games contained herein and shown on this site. Use the information provided on the PotOfEther.com site at your own risk.</p>
-                        <p>Although Pot of Ether may show an address for decentralised application, we accept no responsibility for anything which may or may not occur through any dealings you have through interaction with that decentralised application on the blockchain.</p>
-                        <p>It is your responsibility to satisfy yourself that all decentralised applications that you deal with have a good code-base and will function correctly and as verified.</p>
-                        <p>No gambling occurs on the PotOfEther.com Website. Pot of Ether is not a casino. Only addresses for decentralised gambling games stored as decentralised ethereum applications are provided on the website for convenience.</p>
-                        <p>Pot of Ether does not promote or encourage illegal or underage gambling, or gambling to persons who reside in jurisdictions where gambling is considered unlawful. In those instances, this site is presented for informational and entertainment purposes only.</p>
-                        <p>By entering PotOfEther.com and using the Pot of Ether service you agree that you are aware of the terms outlined herein.</p>
-                    </div>
-                </div>
+            <Tab eventKey={4} title="FAQ">
+                <FAQ />
+            </Tab>
+            <Tab eventKey={5} title="Terms of service">
+                <TermsOfService />
             </Tab>
         </Tabs>
     }
