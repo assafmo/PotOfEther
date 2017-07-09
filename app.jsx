@@ -110,19 +110,19 @@ class FAQ extends React.Component {
             <h4><b>What is this?</b></h4>
             PotOfEther is a distributed application written as a smart contract and powered by the Ethereum blockchain.
             <h4><b>What is a pot?</b></h4>
-            A pot is a game between 3 players. It is created with a buy-in amount, and each player must pay the buy-in in order to participate. After the third player has joined the game, two winner are chosen at random and they split the loser's buy-in between them. <b>Therefore, in each game each player has 66.67% chance of winnig 50% of the buy-in.</b>
+            A pot is a game between 3 players. It is created with a buy-in amount, and each player must pay the buy-in in order to participate. After the third player had joined the game, two winners are chosen at random and they split the loser's buy-in between them. <b>Therefore, in each game a player has 66.67% chance of winnig 50% of the buy-in.</b>
             <h4><b>Do I need an account?</b></h4>
-            No. Your sending address is your account. You can track all your results under "Your games" section.
+            No. Your sending address is your account. You can track all your games under "Your games" section.
             <h4><b>How much does it cost to play?</b></h4>
             PotOfEther takes 1% fee from your winnigs. For example, if you win a pot with a buy-in of 1 ETH, you profit 0.495 ETH and PotOfEther gets 0.005 ETH.
             <h4><b>When can a pot be closed?</b></h4>
-            A pot can be closed two blocks after the last player has joined the game, which is roughly 1-2 minutes. Also a block must be closed less then 256 blocks after the last player has joined. This is due to Ethereum blockhash storage limits. If a pot is closed later then 256 blocks (roughly 2 hours) after the last player had joined the game, PotOfEther refunds each player the buy-in minus 1% fee.
+            A pot can be closed two blocks after the last player had joined the game, which is roughly 1-2 minutes. Also a pot must be closed less then 256 blocks after the last player had joined. This is due to Ethereum blockhash storage limits. If a pot is closed later then 256 blocks (roughly 2 hours) after the last player had joined, PotOfEther refunds each player the buy-in minus 1% fee.
             <h4><b>Who can close a pot?</b></h4>
-            Anyone. PotOfEther is a distributed application powered by the Ethereum blockchain, therefore is has no servers and cannot know when to close a pot. One of the players has to close the pot manually.
+            Anyone. PotOfEther is a distributed application powered by the Ethereum blockchain, therefore is has no servers and cannot know when to close a pot. One of the players must close the pot.
             <h4><b>How winners are decided?</b></h4>
             PotOfEther uses the blockhash of the block following the last player's entrance to the game in order to determine the winners.
             <h4><b>What about miners cheating?</b></h4>
-            Well, it is not worth to cheat as a miner when a pot's profit is less then 4.375 ETH. <b>Therefore it is not advisable to join a pot with buy-in lager than 8.75 ETH.</b>
+            It is not worth to cheat as a miner when a pot's profit is less then 4.375 ETH. <b>Therefore it is not advisable to join a pot with a buy-in amount lager than 8.75 ETH.</b>
             <h4><b>What is the contact's address?</b></h4>
             <ul>
                 <li>MainNet - XXXXXXXXXXXX</li>
