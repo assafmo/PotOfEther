@@ -106,7 +106,7 @@ contract PotOfEther {
             return;
         }
 
-        bytes32 potShaResult = sha3(blockHash);
+        bytes32 potShaResult = sha3(name, blockHash);
         uint8 loserIndex = uint8(uint256(potShaResult) % 3);
 
         address loser = pot.players[loserIndex];
