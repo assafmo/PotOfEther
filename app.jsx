@@ -146,10 +146,10 @@ class MainBody extends React.Component {
                 <PlayTab />
             </Tab>
             <Tab eventKey={2} title="Your games">
-                Tab 2 content
+                <PlayTab />
             </Tab>
             <Tab eventKey={3} title="Games History">
-                Tab 2 content
+                <PlayTab />
             </Tab>
             <Tab eventKey={4} title="FAQ">
                 <FAQ />
