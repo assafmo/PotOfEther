@@ -9,5 +9,5 @@ install:
   - npm install -g ethereumjs-testrpc truffle
 
 script:
-  - testrpc > /dev/null &
+  - nohup testrpc > /dev/null &
   - truffle test
