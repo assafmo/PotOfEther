@@ -1,11 +1,11 @@
-pragma solidity ^0.4.14;
+pragma solidity ^0.4.13;
 contract PotOfEther {
 
     struct Pot {
-        string name;
+        string storage name;
         uint buyIn;
 
-        address[] players;
+        address[] storage players;
         
         uint lastPlayerBlockNumber;
         
