@@ -94,13 +94,13 @@ contract PotOfEther {
         totalPendingRefunds -= (pot.buyIn * 3);
         
         bytes32 blockHash = block.blockhash(pot.lastPlayerBlockNumber + 1);
-        if(blockHash == 0) { // pot expired due to hash storage limits - players didn't close pot
+        if(blockHash == 0) { // pot expired due to hash storage limits - nobody closed the pot
             LogPotExpired(name);
             
-            // return money minus 1% fee
+            // return money - no fee
             for(uint i = 0; i < pot.players.length; i++){
-                refunds[pot.players[i]] += ((pot.buyIn * 99) / 100);
-                totalPendingRefunds += ((pot.buyIn * 99) / 100);
+                refunds[pot.players[i]] += pot.buyIn;
+                totalPendingRefunds += pot.buyIn;
             }
             
             return;
