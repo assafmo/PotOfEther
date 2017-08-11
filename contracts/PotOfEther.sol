@@ -2,10 +2,10 @@ pragma solidity ^0.4.13;
 contract PotOfEther {
 
     struct Pot {
-        string storage name;
+        string name;
         uint buyIn;
 
-        address[] storage players;
+        address[] players;
         
         uint lastPlayerBlockNumber;
         
