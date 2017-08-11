@@ -6,7 +6,7 @@ node_js:
   - "node"
 
 install:
-  - sudo npm install -g ethereumjs-testrpc truffle
+  - npm install -g ethereumjs-testrpc truffle
 
 script:
   - testrpc > /dev/null &
