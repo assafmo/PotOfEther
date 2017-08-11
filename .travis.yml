@@ -1,9 +1,6 @@
 sudo: required
 
-language: node_js
-
-node_js:
-  - "8.2.0"
+language: node
 
 install:
   - sudo npm install -g npm 
