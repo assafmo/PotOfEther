@@ -1,0 +1,14 @@
+sudo: required
+
+language: node_js
+
+node_js:
+  - "8.2.0"
+
+install:
+  - sudo npm install -g npm 
+  - sudo npm install -g ethereumjs-testrpc truffle
+
+script:
+  - testrpc > /dev/null &
+  - truffle test
