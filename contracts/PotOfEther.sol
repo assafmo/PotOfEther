@@ -1,4 +1,4 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.14;
 contract PotOfEther {
 
     struct Pot {
@@ -44,7 +44,7 @@ contract PotOfEther {
         require(bytes(name).length > 0); // name can't be empty 
         require(nameToPot[name].buyIn == 0); // there isn't already a pot with this name 
 
-        Pot pot = nameToPot[name];
+        Pot storage pot = nameToPot[name];
         pot.name = name;
         pot.buyIn = msg.value;
         pot.players.push(msg.sender);
@@ -57,7 +57,7 @@ contract PotOfEther {
     }
 
     function joinPot(string name) payable {
-        Pot pot = nameToPot[name];
+        Pot storage pot = nameToPot[name];
         require(pot.isOpen); // pot exists and isn't over
         require(pot.players.length < 3); // pot isn't full
         require(msg.value == pot.buyIn); // must pay buyIn amount
@@ -77,14 +77,14 @@ contract PotOfEther {
     }
 
     function canClosePot(string name) constant returns (bool){
-        Pot pot = nameToPot[name];
+        Pot storage pot = nameToPot[name];
         return pot.isOpen &&
                 pot.players.length == 3 &&
                 block.number > pot.lastPlayerBlockNumber + 1;
     }
 
     function closePot(string name){
-        Pot pot = nameToPot[name];
+        Pot storage pot = nameToPot[name];
         require(pot.isOpen); // pot isn't closed
         require(pot.players.length == 3); // pot full
         require(block.number > pot.lastPlayerBlockNumber + 1);
