@@ -1,4 +1,4 @@
-pragma solidity ^0.4.13;
+pragma solidity ^0.4.11;
 contract PotOfEther {
 
     struct Pot {
@@ -21,7 +21,6 @@ contract PotOfEther {
     event LogPotCreated(string name, uint buyIn);
     event LogPotJoined(string name, address indexed newPlayer, uint buyIn);
     event LogPotFull(string name);
-    event LogPotExpired(string name);
     event LogPotClosed(string name);
     event LogPotWinner(string name, address indexed winner, uint refundAmount);
     event LogPotLoser(string name, address indexed loser);
@@ -93,18 +92,7 @@ contract PotOfEther {
         LogPotClosed(name);
         totalPendingRefunds -= (pot.buyIn * 3);
         
-        bytes32 blockHash = block.blockhash(pot.lastPlayerBlockNumber + 1);
-        if(blockHash == 0) { // pot expired due to hash storage limits - nobody closed the pot
-            LogPotExpired(name);
-            
-            // return money - no fee
-            for(uint i = 0; i < pot.players.length; i++){
-                refunds[pot.players[i]] += pot.buyIn;
-                totalPendingRefunds += pot.buyIn;
-            }
-            
-            return;
-        }
+        bytes32 blockHash = block.blockhash(block.number);
 
         bytes32 potShaResult = sha3(name, blockHash);
         uint8 loserIndex = uint8(uint256(potShaResult) % 3);

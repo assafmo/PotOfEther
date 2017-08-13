@@ -343,24 +343,6 @@ contract("PotOfEther", accounts => {
       assert(loserEvent.args.loser != txResult.logs[1].args.winner);
       assert(loserEvent.args.loser != txResult.logs[2].args.winner);
     });
-
-    it("emit LogPotExpired when close is expired", async () => {
-      const instance = await PotOfEther.new();
-      const potName = "banana";
-
-      await instance.createPot(potName, { from: accounts[0], value: 1000 });
-      await instance.joinPot(potName, { from: accounts[1], value: 1000 });
-      await instance.joinPot(potName, { from: accounts[2], value: 1000 });
-
-      await untilPotExpires(instance, potName, accounts[9]);
-
-      const txResult = await instance.closePot(potName);
-
-      const expiresEvent = txResult.logs[1];
-
-      assert.equal(expiresEvent.event, "LogPotExpired");
-      assert.equal(expiresEvent.args.name, potName);
-    });
   });
 
   describe("withdrawRefund", () => {
@@ -436,38 +418,6 @@ contract("PotOfEther", accounts => {
       assert.equal(refundEvent.event, "LogAccountRefund");
       assert.equal(refundEvent.args.account, accounts[loserIndex]);
       assert.equal(refundEvent.args.refundAmount, 0);
-    });
-
-    it("full refund if pot expires (no fees)", async () => {
-      const instance = await PotOfEther.new();
-      const potName = "banana";
-
-      const buyIn = 1000;
-
-      await instance.createPot(potName, { from: accounts[0], value: buyIn });
-      await instance.joinPot(potName, { from: accounts[1], value: buyIn });
-      await instance.joinPot(potName, { from: accounts[2], value: buyIn });
-
-      await untilPotExpires(instance, potName, accounts[9]);
-
-      await instance.closePot(potName);
-
-      assert.equal((await instance.refunds.call(accounts[0])).toNumber(), buyIn);
-      assert.equal((await instance.refunds.call(accounts[1])).toNumber(), buyIn);
-      assert.equal((await instance.refunds.call(accounts[2])).toNumber(), buyIn);
-
-
-      for (let i of [0, 1, 2]) {
-        const txResult = await instance.withdrawRefund({ from: accounts[i] });
-
-        const refundShoudBe = buyIn;
-
-        const refundEvent = txResult.logs[0];
-
-        assert.equal(refundEvent.event, "LogAccountRefund");
-        assert.equal(refundEvent.args.account, accounts[i]);
-        assert.equal(refundEvent.args.refundAmount, refundShoudBe);
-      }
     });
   });
 
@@ -551,15 +501,5 @@ async function untilCanClosePot(instance, potName, account) {
     if (await instance.canClosePot.call(potName) === true) {
       break;
     }
-  }
-}
-
-// we need to wait 257 blocks after last player has joined
-// this is due to hash storage limits
-// solidity can get hash of only last 256 blocks (not including the current one)
-// so we'll create dummy transactions
-async function untilPotExpires(instance, potName, account) {
-  for (let i = 0; i < 257; i++) {
-    await instance.ownerWithdraw();
   }
 }
