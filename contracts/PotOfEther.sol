@@ -30,11 +30,11 @@ contract PotOfEther {
         owner = msg.sender;
     }
 
-    function availableOwnerWithdraw() constant returns (uint){
+    function availableOwnerWithdraw() constant returns (uint) {
         return this.balance - totalPendingRefunds;
     }
 
-    function ownerWithdraw(){
+    function ownerWithdraw() {
         owner.transfer(availableOwnerWithdraw());
     }
 
@@ -60,7 +60,7 @@ contract PotOfEther {
         require(pot.isOpen); // pot exists and isn't over
         require(pot.players.length < 3); // pot isn't full
         require(msg.value == pot.buyIn); // must pay buyIn amount
-        for(uint i = 0; i < pot.players.length; i++){
+        for (uint i = 0; i < pot.players.length; i++) {
             require(pot.players[i] != msg.sender); //must be new to this pot
         }
 
@@ -69,20 +69,18 @@ contract PotOfEther {
         
         totalPendingRefunds += pot.buyIn; // owner can't withdraw this funds while pot is open
 
-        if(pot.players.length == 3){
+        if (pot.players.length == 3) {
             pot.lastPlayerBlockNumber = block.number;
             LogPotFull(name);
         }
     }
 
-    function canClosePot(string name) constant returns (bool){
+    function canClosePot(string name) constant returns (bool) {
         Pot storage pot = nameToPot[name];
-        return pot.isOpen &&
-                pot.players.length == 3 &&
-                block.number > pot.lastPlayerBlockNumber + 1;
+        return pot.isOpen && pot.players.length == 3 && block.number > pot.lastPlayerBlockNumber + 1;
     }
 
-    function closePot(string name){
+    function closePot(string name) {
         Pot storage pot = nameToPot[name];
         require(pot.isOpen); // pot isn't closed
         require(pot.players.length == 3); // pot full
@@ -116,7 +114,7 @@ contract PotOfEther {
         LogPotLoser(name, loser);
     }
 
-    function withdrawRefund(){
+    function withdrawRefund() {
         uint refund = refunds[msg.sender];
         refunds[msg.sender] = 0;
         totalPendingRefunds -= refund;
