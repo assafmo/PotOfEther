@@ -77,14 +77,12 @@ contract PotOfEther {
 
     function canClosePot(string name) constant returns (bool) {
         Pot storage pot = nameToPot[name];
-        return pot.isOpen && pot.players.length == 3 && block.number > pot.lastPlayerBlockNumber + 1;
+        return pot.isOpen && pot.players.length == 3 && block.number > pot.lastPlayerBlockNumber;
     }
 
     function closePot(string name) {
         Pot storage pot = nameToPot[name];
-        require(pot.isOpen); // pot isn't closed
-        require(pot.players.length == 3); // pot full
-        require(block.number > pot.lastPlayerBlockNumber + 1);
+        require(canClosePot(name));
         
         pot.isOpen = false;
         LogPotClosed(name);
