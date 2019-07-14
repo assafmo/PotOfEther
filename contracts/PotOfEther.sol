@@ -88,7 +88,7 @@ contract PotOfEther {
         LogPotClosed(name);
         totalPendingRefunds -= (pot.buyIn * 3);
         
-        bytes32 blockHash = block.blockhash(block.number);
+        bytes32 blockHash = block.blockhash(pot.lastPlayerBlockNumber + 1);
 
         bytes32 potShaResult = sha3(name, blockHash);
         uint8 loserIndex = uint8(uint256(potShaResult) % 3);
